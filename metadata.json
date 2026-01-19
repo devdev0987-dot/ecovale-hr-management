@@ -1,0 +1,5 @@
+
+{
+  "name": "EcoVale HR Web App",
+  "description": "A comprehensive HR management web application prototype for EcoVale, designed for managing employees, designations, payroll, and more. All data is managed within the frontend using React state and the window.storage API for persistence."
+}
