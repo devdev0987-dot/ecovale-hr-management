@@ -81,7 +81,7 @@ const EmployeeList = () => {
                   <td>{employee.email}</td>
                   <td>{employee.position}</td>
                   <td>{employee.department}</td>
-                  <td>${employee.salary.toLocaleString()}</td>
+                  <td>${(employee.salary || 0).toLocaleString()}</td>
                   <td>{formatDate(employee.hireDate)}</td>
                   <td>
                     <span className={`status-badge status-${employee.status}`}>

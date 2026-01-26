@@ -18,6 +18,10 @@
     "bcryptjs": "^2.4.3",
     "jsonwebtoken": "^9.0.0"
   },
+  "comments": {
+    "bcryptjs": "Reserved for future password hashing functionality",
+    "jsonwebtoken": "Reserved for future JWT authentication"
+  },
   "devDependencies": {
     "nodemon": "^2.0.22"
   }
