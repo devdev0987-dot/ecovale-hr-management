@@ -17,10 +17,6 @@
   from = "/*"
   to = "/index.html"
   status = 200
-  force = false
-  
-  # Don't redirect these file types
-  conditions = {Accept = "text/html"}
 
 # Additional redirect rules (optional)
 [[headers]]
