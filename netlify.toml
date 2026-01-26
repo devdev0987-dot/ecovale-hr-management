@@ -1,0 +1,32 @@
+# Netlify Configuration for Ecovale HR Management System
+# Docs: https://docs.netlify.com/configure-builds/file-based-configuration/
+
+[build]
+  # Build command
+  command = "npm run build"
+  
+  # Output directory (Vite builds to 'dist' by default)
+  publish = "dist"
+  
+  # Environment variables
+  [build.environment]
+    NODE_VERSION = "18"
+
+# SPA Redirect Rules - Fix 404 on page refresh/direct routes
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  force = false
+  
+  # Don't redirect these file types
+  conditions = {Accept = "text/html"}
+
+# Additional redirect rules (optional)
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"

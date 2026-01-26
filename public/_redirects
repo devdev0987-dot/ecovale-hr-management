@@ -1,0 +1,7 @@
+# Netlify Redirects File for SPA (Single Page Application)
+# This ensures all routes are handled by React's client-side routing
+# Docs: https://docs.netlify.com/routing/redirects/
+
+# Redirect all requests to index.html (except static assets)
+# The 200 status code means it's a rewrite, not a redirect
+/*    /index.html   200
