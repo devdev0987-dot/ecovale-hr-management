@@ -1,0 +1,79 @@
+version: '3.8'
+
+# =================================================================
+# Docker Compose for Production Deployment
+# =================================================================
+# This is a production-oriented configuration.
+# Use external database (AWS RDS) instead of containerized MySQL.
+#
+# Usage: docker-compose -f docker-compose.prod.yml up -d
+
+services:
+  # =================================================================
+  # Spring Boot Backend Service (Production)
+  # =================================================================
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    
+    container_name: ecovale-hr-backend-prod
+    restart: always
+    
+    ports:
+      - "8080:8080"
+    
+    environment:
+      # Database Configuration (Use AWS RDS or external DB)
+      DB_HOST: ${DB_HOST:-your-rds-endpoint.rds.amazonaws.com}
+      DB_PORT: ${DB_PORT:-3306}
+      DB_NAME: ${DB_NAME:-ecovale_hr}
+      DB_USERNAME: ${DB_USERNAME:-admin}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_USE_SSL: ${DB_USE_SSL:-true}
+      
+      # JPA Configuration (Production settings)
+      JPA_DDL_AUTO: ${JPA_DDL_AUTO:-validate}
+      JPA_SHOW_SQL: ${JPA_SHOW_SQL:-false}
+      JPA_FORMAT_SQL: ${JPA_FORMAT_SQL:-false}
+      
+      # Spring Profile
+      SPRING_PROFILES_ACTIVE: prod
+      
+      # JVM Options (Adjust based on container resources)
+      JAVA_OPTS: "-Xms1024m -Xmx2048m -XX:+UseG1GC -XX:MaxGCPauseMillis=200"
+    
+    networks:
+      - ecovale-network
+    
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 90s
+    
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '1'
+          memory: 1G
+    
+    # Logging configuration
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+# =================================================================
+# Networks
+# =================================================================
+networks:
+  ecovale-network:
+    driver: bridge
+    name: ecovale-hr-network-prod

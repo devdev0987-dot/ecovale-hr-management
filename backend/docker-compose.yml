@@ -1,0 +1,115 @@
+version: '3.8'
+
+# =================================================================
+# Docker Compose for Ecovale HR Backend
+# =================================================================
+# Services:
+#   - mysql: MySQL 8.0 database
+#   - backend: Spring Boot application
+#
+# Networks:
+#   - ecovale-network: Bridge network for service communication
+#
+# Volumes:
+#   - mysql-data: Persistent storage for MySQL data
+
+services:
+  # =================================================================
+  # MySQL Database Service
+  # =================================================================
+  mysql:
+    image: mysql:8.0
+    container_name: ecovale-hr-mysql
+    restart: unless-stopped
+    
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: ecovale_hr
+      MYSQL_USER: hruser
+      MYSQL_PASSWORD: hrpassword
+      MYSQL_ROOT_HOST: '%'
+    
+    ports:
+      - "3306:3306"
+    
+    volumes:
+      # Persistent data storage
+      - mysql-data:/var/lib/mysql
+      # Optional: Initialize database with schema
+      # - ./database-schema.sql:/docker-entrypoint-initdb.d/init.sql
+    
+    networks:
+      - ecovale-network
+    
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    
+    command: --default-authentication-plugin=mysql_native_password
+
+  # =================================================================
+  # Spring Boot Backend Service
+  # =================================================================
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    
+    container_name: ecovale-hr-backend
+    restart: unless-stopped
+    
+    ports:
+      - "8080:8080"
+    
+    environment:
+      # Database Configuration
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: ecovale_hr
+      DB_USERNAME: hruser
+      DB_PASSWORD: hrpassword
+      DB_USE_SSL: "false"
+      
+      # JPA Configuration
+      JPA_DDL_AUTO: update
+      JPA_SHOW_SQL: "true"
+      JPA_FORMAT_SQL: "true"
+      
+      # Spring Profile
+      SPRING_PROFILES_ACTIVE: dev
+      
+      # JVM Options
+      JAVA_OPTS: "-Xms512m -Xmx1024m"
+    
+    depends_on:
+      mysql:
+        condition: service_healthy
+    
+    networks:
+      - ecovale-network
+    
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+# =================================================================
+# Networks
+# =================================================================
+networks:
+  ecovale-network:
+    driver: bridge
+    name: ecovale-hr-network
+
+# =================================================================
+# Volumes
+# =================================================================
+volumes:
+  mysql-data:
+    driver: local
+    name: ecovale-hr-mysql-data

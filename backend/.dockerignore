@@ -1,0 +1,47 @@
+# Maven build artifacts
+target/
+!target/*.jar
+
+# Maven wrapper
+.mvn/wrapper/maven-wrapper.jar
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+.classpath
+.project
+.settings/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Git files
+.git/
+.gitignore
+.gitattributes
+
+# Documentation (not needed in image)
+*.md
+README.md
+docs/
+
+# Environment files (secrets should not be in image)
+.env
+.env.local
+.env.production
+
+# Logs
+*.log
+logs/
+
+# Test files
+src/test/
+
+# Docker files (don't copy into image)
+Dockerfile
+docker-compose.yml
+.dockerignore
