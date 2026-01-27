@@ -16,12 +16,8 @@ export default defineConfig(({ mode }) => {
         assetsDir: 'assets',
         sourcemap: true,
       },
-      define: {
-        // Use import.meta.env instead of process.env for Vite
-        // The VITE_ prefix variables are automatically available via import.meta.env
-        // Only define if you need to explicitly pass them
-        'import.meta.env.VITE_GEMINI_API_KEY': JSON.stringify(env.VITE_GEMINI_API_KEY)
-      },
+      // Vite automatically exposes all VITE_* environment variables via import.meta.env
+      // No need to explicitly define them here unless overriding is required
       resolve: {
         alias: {
           '@': path.resolve(__dirname, '.'),
