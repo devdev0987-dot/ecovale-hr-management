@@ -26,8 +26,13 @@ replay_pid*
 # Environment files - Vite
 .env
 .env.local
-.env.*.local
+.env.development
+.env.development.local
+.env.staging
+.env.staging.local
 .env.production
+.env.production.local
+.env.*.local
 
 # Keep example file
 !.env.example
