@@ -1,0 +1,42 @@
+[Unit]
+Description=Ecovale HR System API
+After=syslog.target network.target
+
+[Service]
+Type=simple
+User=ecovale
+Group=ecovale
+WorkingDirectory=/opt/ecovale-hr
+ExecStart=/usr/bin/java \
+    -Xms512m \
+    -Xmx2048m \
+    -XX:+UseG1GC \
+    -XX:MaxGCPauseMillis=200 \
+    -XX:+HeapDumpOnOutOfMemoryError \
+    -XX:HeapDumpPath=/var/log/ecovale-hr/heap-dump.hprof \
+    -Dspring.profiles.active=prod \
+    -Djava.security.egd=file:/dev/./urandom \
+    -jar /opt/ecovale-hr/ecovale-hr.jar
+
+# Environment variables file
+EnvironmentFile=/etc/ecovale-hr/.env
+
+# Restart configuration
+Restart=always
+RestartSec=10
+StandardOutput=append:/var/log/ecovale-hr/stdout.log
+StandardError=append:/var/log/ecovale-hr/stderr.log
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/log/ecovale-hr
+
+# Resource limits
+LimitNOFILE=65536
+LimitNPROC=4096
+
+[Install]
+WantedBy=multi-user.target

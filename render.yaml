@@ -1,0 +1,36 @@
+services:
+  - type: web
+    name: ecovale-hr-backend
+    env: java
+    region: oregon
+    plan: free
+    buildCommand: mvn clean package -DskipTests
+    startCommand: java -Dserver.port=$PORT -Dspring.profiles.active=prod -jar target/*.jar
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: DATABASE_USERNAME
+        sync: false
+      - key: DATABASE_PASSWORD
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRATION
+        value: 86400000
+      - key: JWT_REFRESH_EXPIRATION
+        value: 604800000
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: ADMIN_USERNAME
+        value: admin
+      - key: ADMIN_PASSWORD
+        generateValue: true
+
+databases:
+  - name: ecovale-hr-db
+    databaseName: ecovale_hr
+    user: ecovale_admin
+    plan: free
