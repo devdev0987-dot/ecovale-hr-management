@@ -1,0 +1,29 @@
+{
+  "name": "ecovale-hr-management",
+  "version": "1.0.0",
+  "description": "Ecovale HR Management System - Full Stack Application",
+  "private": true,
+  "scripts": {
+    "build": "cd frontend && npm install && npm run build",
+    "start": "cd frontend && npm start",
+    "install:frontend": "cd frontend && npm install",
+    "install:backend": "cd backend && npm install",
+    "install:all": "npm run install:frontend && npm run install:backend",
+    "dev:frontend": "cd frontend && npm start",
+    "dev:backend": "cd backend && npm start"
+  },
+  "keywords": [
+    "hr-management",
+    "employee-management",
+    "react",
+    "nodejs",
+    "express",
+    "mongodb"
+  ],
+  "author": "Ecovale",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/devdev0987-dot/ecovale-hr-management.git"
+  }
+}

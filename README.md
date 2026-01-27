@@ -60,6 +60,8 @@ ecovale-hr-management/
 │   │   └── index.css
 │   ├── .env.example              # Environment variables template
 │   └── package.json
+├── netlify.toml                  # Netlify deployment configuration
+├── package.json                  # Root package.json for deployment
 └── README.md
 ```
 
@@ -179,6 +181,40 @@ npm run dev  # Uses nodemon for auto-reload
 cd frontend
 npm start  # Runs with hot reload
 ```
+
+## Deployment
+
+### Deploying to Netlify
+
+This project is configured for easy deployment to Netlify:
+
+1. **Automatic Configuration**: The project includes a `netlify.toml` file with the correct build settings:
+   - Build command: `npm run build` (builds the frontend from repository root)
+   - Publish directory: `frontend/build`
+   - SPA redirects configured
+
+2. **Manual Netlify Configuration**:
+   If you need to configure manually in the Netlify UI:
+   - Base directory: Leave empty (repo root)
+   - Build command: `npm run build`
+   - Publish directory: `frontend/build`
+
+3. **Environment Variables**:
+   Configure in Netlify UI under Site settings → Build & deploy → Environment:
+   - `REACT_APP_API_URL`: Your backend API URL (e.g., `https://api.yourdomain.com/api`)
+
+### Deploying the Backend
+
+The backend can be deployed to services like:
+- **Heroku**: Use the `backend/` directory as the app root
+- **Railway**: Point to `backend/package.json`
+- **Render**: Configure to build from `backend/` directory
+- **DigitalOcean App Platform**: Set root directory to `backend/`
+
+Make sure to set environment variables:
+- `MONGODB_URI`: Your MongoDB connection string
+- `PORT`: Port number (usually auto-assigned by the platform)
+- `NODE_ENV`: Set to `production`
 
 ## Future Enhancements
 
