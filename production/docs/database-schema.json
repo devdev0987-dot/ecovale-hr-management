@@ -1,0 +1,963 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ecovale-hr-database-schema",
+  "title": "EcoVale HR Database Schema",
+  "description": "Complete database schema definition for EcoVale HR Management System. This is the SINGLE SOURCE OF TRUTH for all database entities, attributes, relationships, constraints, and business rules.",
+  "version": "1.0.0",
+  "createdAt": "2026-01-19",
+  "database": {
+    "type": "MongoDB",
+    "version": "7.x",
+    "name": "ecovale_hr"
+  },
+  "collections": {
+    "users": {
+      "description": "System users with authentication credentials",
+      "fields": {
+        "_id": {
+          "type": "ObjectId",
+          "description": "MongoDB auto-generated unique identifier",
+          "required": true,
+          "primaryKey": true
+        },
+        "email": {
+          "type": "String",
+          "description": "User's email address for login",
+          "required": true,
+          "unique": true,
+          "maxLength": 255,
+          "format": "email",
+          "lowercase": true,
+          "trim": true,
+          "validation": {
+            "pattern": "^\\S+@\\S+\\.\\S+$",
+            "message": "Invalid email format"
+          }
+        },
+        "password": {
+          "type": "String",
+          "description": "Bcrypt hashed password",
+          "required": true,
+          "minLength": 6,
+          "select": false,
+          "notes": "Never return in API responses by default"
+        },
+        "fullName": {
+          "type": "String",
+          "description": "User's full name",
+          "required": true,
+          "maxLength": 255,
+          "trim": true
+        },
+        "role": {
+          "type": "String",
+          "description": "User role for authorization",
+          "required": true,
+          "enum": ["admin", "manager", "hr", "employee"],
+          "default": "admin"
+        },
+        "isActive": {
+          "type": "Boolean",
+          "description": "Account status - inactive users cannot login",
+          "required": true,
+          "default": true
+        },
+        "lastLogin": {
+          "type": "Date",
+          "description": "Timestamp of last successful login",
+          "required": false,
+          "default": null
+        },
+        "createdAt": {
+          "type": "Date",
+          "description": "Record creation timestamp",
+          "auto": true
+        },
+        "updatedAt": {
+          "type": "Date",
+          "description": "Record last update timestamp",
+          "auto": true
+        }
+      },
+      "indexes": [
+        { "fields": { "email": 1 }, "options": { "unique": true } },
+        { "fields": { "role": 1 } },
+        { "fields": { "isActive": 1 } }
+      ],
+      "hooks": {
+        "preSave": "Hash password if modified using bcrypt with 10 salt rounds"
+      },
+      "methods": {
+        "comparePassword": "Compare candidate password with stored hash"
+      }
+    },
+    "departments": {
+      "description": "Organizational departments",
+      "fields": {
+        "_id": {
+          "type": "ObjectId",
+          "primaryKey": true
+        },
+        "name": {
+          "type": "String",
+          "description": "Department name",
+          "required": true,
+          "unique": true,
+          "enum": ["IT", "HR", "Finance", "Sales", "Marketing"],
+          "trim": true
+        },
+        "description": {
+          "type": "String",
+          "description": "Department description",
+          "required": false,
+          "trim": true
+        },
+        "headEmployeeId": {
+          "type": "ObjectId",
+          "description": "Reference to department head employee",
+          "ref": "Employee",
+          "required": false,
+          "default": null
+        },
+        "isActive": {
+          "type": "Boolean",
+          "required": true,
+          "default": true
+        },
+        "createdAt": { "type": "Date", "auto": true },
+        "updatedAt": { "type": "Date", "auto": true }
+      },
+      "indexes": [
+        { "fields": { "name": 1 }, "options": { "unique": true } },
+        { "fields": { "isActive": 1 } }
+      ],
+      "seedData": [
+        { "name": "IT", "description": "Information Technology" },
+        { "name": "HR", "description": "Human Resources" },
+        { "name": "Finance", "description": "Finance and Accounting" },
+        { "name": "Sales", "description": "Sales and Business Development" },
+        { "name": "Marketing", "description": "Marketing and Communications" }
+      ]
+    },
+    "designations": {
+      "description": "Job titles and positions within departments",
+      "fields": {
+        "_id": { "type": "ObjectId", "primaryKey": true },
+        "title": {
+          "type": "String",
+          "description": "Designation title",
+          "required": true,
+          "maxLength": 255,
+          "trim": true
+        },
+        "department": {
+          "type": "ObjectId",
+          "description": "Reference to department",
+          "ref": "Department",
+          "required": true
+        },
+        "description": {
+          "type": "String",
+          "required": false,
+          "trim": true
+        },
+        "reportingTo": {
+          "type": "ObjectId",
+          "description": "Self-referential - parent designation in hierarchy",
+          "ref": "Designation",
+          "required": false,
+          "default": null
+        },
+        "level": {
+          "type": "Number",
+          "description": "Hierarchy level - lower number = higher position",
+          "required": true,
+          "min": 1,
+          "default": 1
+        },
+        "createdAt": { "type": "Date", "auto": true },
+        "updatedAt": { "type": "Date", "auto": true }
+      },
+      "indexes": [
+        { "fields": { "department": 1 } },
+        { "fields": { "title": 1 } },
+        { "fields": { "level": 1 } }
+      ]
+    },
+    "employees": {
+      "description": "Core employee entity with embedded personal, employment, and salary information",
+      "fields": {
+        "_id": { "type": "ObjectId", "primaryKey": true },
+        "employeeId": {
+          "type": "String",
+          "description": "Sequential numeric ID (1, 2, 3...)",
+          "required": true,
+          "unique": true,
+          "notes": "Generated as MAX(existing) + 1"
+        },
+        "personalInfo": {
+          "type": "Embedded",
+          "description": "Personal and contact information",
+          "fields": {
+            "firstName": { "type": "String", "required": true, "maxLength": 100, "trim": true },
+            "middleName": { "type": "String", "required": false, "maxLength": 100, "trim": true },
+            "lastName": { "type": "String", "required": true, "maxLength": 100, "trim": true },
+            "dob": { "type": "Date", "required": false, "description": "Date of birth" },
+            "gender": { "type": "String", "required": true, "enum": ["Male", "Female", "Other"] },
+            "photo": { "type": "String", "required": false, "description": "Base64 encoded or URL" },
+            "contactNumber": {
+              "type": "String",
+              "required": true,
+              "validation": { "pattern": "^[0-9]{10}$", "message": "Invalid phone number" }
+            },
+            "alternateContact": { "type": "String", "required": false },
+            "emergencyContact": { "type": "String", "required": false },
+            "personalEmail": {
+              "type": "String",
+              "required": true,
+              "lowercase": true,
+              "validation": { "pattern": "^\\S+@\\S+\\.\\S+$" }
+            },
+            "permanentAddress": { "type": "String", "required": false },
+            "currentAddress": { "type": "String", "required": true },
+            "pfNumber": { "type": "String", "required": false, "description": "Provident Fund number" },
+            "esiNumber": { "type": "String", "required": false, "description": "ESI number" },
+            "bloodGroup": { "type": "String", "required": false },
+            "fatherName": { "type": "String", "required": false },
+            "motherName": { "type": "String", "required": false }
+          }
+        },
+        "employmentDetails": {
+          "type": "Embedded",
+          "description": "Employment-specific information",
+          "fields": {
+            "type": {
+              "type": "String",
+              "required": true,
+              "enum": ["full-time", "part-time"]
+            },
+            "department": {
+              "type": "ObjectId",
+              "ref": "Department",
+              "required": true
+            },
+            "designation": {
+              "type": "ObjectId",
+              "ref": "Designation",
+              "required": true
+            },
+            "reportingManager": {
+              "type": "ObjectId",
+              "ref": "Employee",
+              "required": false,
+              "default": null,
+              "description": "Self-referential - cannot report to self"
+            },
+            "joinDate": { "type": "Date", "required": false },
+            "officialEmail": {
+              "type": "String",
+              "required": true,
+              "unique": true,
+              "lowercase": true,
+              "description": "Auto-generated: firstname.lastname@ecovale.com"
+            },
+            "workLocation": {
+              "type": "String",
+              "required": true,
+              "enum": ["Bangalore", "Mangaluru", "Mysore", "Belagaum", "Hubballi", "Kolar", "Tumkur", "Shivamogga", "Remote"]
+            },
+            "probationPeriod": {
+              "type": "Number",
+              "required": true,
+              "default": 6,
+              "description": "Probation period in months"
+            },
+            "grade": {
+              "type": "String",
+              "required": false,
+              "enum": ["A", "B", "C", "D"]
+            }
+          }
+        },
+        "salaryInfo": {
+          "type": "Embedded",
+          "description": "Salary structure and payment details",
+          "fields": {
+            "ctc": {
+              "type": "Number",
+              "required": true,
+              "min": 0,
+              "description": "Annual Cost to Company"
+            },
+            "basic": {
+              "type": "Number",
+              "required": true,
+              "min": 0,
+              "description": "Monthly basic salary = CTC * 0.50 / 12"
+            },
+            "hraPercentage": {
+              "type": "Number",
+              "required": true,
+              "min": 0,
+              "max": 100,
+              "description": "HRA as percentage of basic"
+            },
+            "hra": {
+              "type": "Number",
+              "required": true,
+              "min": 0,
+              "description": "Monthly HRA = basic * hraPercentage / 100"
+            },
+            "conveyance": { "type": "Number", "default": 0 },
+            "telephone": { "type": "Number", "default": 0 },
+            "medicalAllowance": { "type": "Number", "default": 0 },
+            "specialAllowance": {
+              "type": "Number",
+              "default": 0,
+              "description": "Balancing component to match CTC"
+            },
+            "employeeHealthInsuranceAnnual": { "type": "Number", "default": 1000 },
+            "gross": {
+              "type": "Number",
+              "required": true,
+              "min": 0,
+              "description": "Monthly gross = basic + all allowances"
+            },
+            "includePF": {
+              "type": "Boolean",
+              "default": true,
+              "description": "Whether PF is applicable"
+            },
+            "includeESI": {
+              "type": "Boolean",
+              "default": false,
+              "description": "Whether ESI is applicable (gross < 21000)"
+            },
+            "pfDeduction": {
+              "type": "Number",
+              "default": 0,
+              "description": "Monthly employee PF = min(basic, 15000) * 0.12"
+            },
+            "esiDeduction": {
+              "type": "Number",
+              "default": 0,
+              "description": "Monthly employee ESI = gross * 0.0075"
+            },
+            "employerPF": {
+              "type": "Number",
+              "default": 0,
+              "description": "Monthly employer PF contribution"
+            },
+            "employerESI": {
+              "type": "Number",
+              "default": 0,
+              "description": "Monthly employer ESI = gross * 0.0325"
+            },
+            "professionalTax": {
+              "type": "Number",
+              "default": 0,
+              "description": "Monthly PT = 200 if gross > 25000"
+            },
+            "tds": {
+              "type": "Number",
+              "default": 0,
+              "description": "Annual TDS percentage"
+            },
+            "tdsMonthly": {
+              "type": "Number",
+              "default": 0,
+              "description": "Monthly TDS deduction"
+            },
+            "net": {
+              "type": "Number",
+              "required": true,
+              "min": 0,
+              "description": "Monthly net = gross - all deductions"
+            },
+            "paymentMode": {
+              "type": "String",
+              "required": true,
+              "enum": ["Bank", "Cash", "Cheque"]
+            },
+            "bankDetails": {
+              "type": "Embedded",
+              "required": false,
+              "fields": {
+                "bankName": { "type": "String", "required": true, "trim": true },
+                "accountHolder": { "type": "String", "required": true, "trim": true },
+                "accountNumber": { "type": "String", "required": true, "trim": true },
+                "ifscCode": {
+                  "type": "String",
+                  "required": true,
+                  "trim": true,
+                  "validation": { "pattern": "^[A-Z]{4}0[A-Z0-9]{6}$", "message": "Invalid IFSC code" }
+                },
+                "branch": { "type": "String", "required": true, "trim": true }
+              }
+            },
+            "annexure": {
+              "type": "Embedded",
+              "required": false,
+              "fields": {
+                "fileName": { "type": "String" },
+                "data": { "type": "String", "description": "Base64 encoded" },
+                "generatedAt": { "type": "Date" }
+              }
+            }
+          }
+        },
+        "documents": {
+          "type": "Array",
+          "description": "Employee documents (Aadhar, PAN, etc.)",
+          "items": {
+            "type": "Embedded",
+            "fields": {
+              "_id": { "type": "ObjectId", "auto": true },
+              "type": { "type": "String", "required": true },
+              "fileName": { "type": "String", "required": true },
+              "data": { "type": "String", "required": true, "description": "Base64 or URL" },
+              "uploadDate": { "type": "Date", "default": "Date.now" }
+            }
+          }
+        },
+        "careerHistory": {
+          "type": "Array",
+          "description": "Career events (promotions, increments)",
+          "items": {
+            "type": "Embedded",
+            "fields": {
+              "_id": { "type": "ObjectId", "auto": true },
+              "type": { "type": "String", "required": true, "enum": ["promotion", "increment", "demotion"] },
+              "date": { "type": "Date", "required": true },
+              "details": { "type": "Mixed" }
+            }
+          }
+        },
+        "status": {
+          "type": "String",
+          "required": true,
+          "enum": ["active", "inactive"],
+          "default": "active"
+        },
+        "createdAt": { "type": "Date", "auto": true },
+        "updatedAt": { "type": "Date", "auto": true }
+      },
+      "indexes": [
+        { "fields": { "employeeId": 1 }, "options": { "unique": true } },
+        { "fields": { "employmentDetails.officialEmail": 1 }, "options": { "unique": true } },
+        { "fields": { "status": 1 } },
+        { "fields": { "employmentDetails.department": 1 } },
+        { "fields": { "employmentDetails.designation": 1 } },
+        { "fields": { "personalInfo.firstName": 1, "personalInfo.lastName": 1 } }
+      ],
+      "virtuals": {
+        "fullName": "return `${this.personalInfo.firstName} ${this.personalInfo.lastName}`"
+      }
+    },
+    "attendances": {
+      "description": "Monthly attendance records per employee",
+      "fields": {
+        "_id": { "type": "ObjectId", "primaryKey": true },
+        "employee": {
+          "type": "ObjectId",
+          "ref": "Employee",
+          "required": true
+        },
+        "employeeName": {
+          "type": "String",
+          "required": true,
+          "description": "Denormalized for reporting"
+        },
+        "month": {
+          "type": "String",
+          "required": true,
+          "enum": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+        },
+        "year": {
+          "type": "String",
+          "required": true
+        },
+        "totalWorkingDays": {
+          "type": "Number",
+          "required": true,
+          "min": 1,
+          "max": 31
+        },
+        "presentDays": {
+          "type": "Number",
+          "required": true,
+          "min": 0
+        },
+        "absentDays": {
+          "type": "Number",
+          "required": true,
+          "min": 0
+        },
+        "paidLeave": {
+          "type": "Number",
+          "default": 0,
+          "min": 0
+        },
+        "unpaidLeave": {
+          "type": "Number",
+          "default": 0,
+          "min": 0
+        },
+        "payableDays": {
+          "type": "Number",
+          "required": true,
+          "description": "Auto-calculated: presentDays + paidLeave"
+        },
+        "lossOfPayDays": {
+          "type": "Number",
+          "required": true,
+          "description": "Auto-calculated: unpaidLeave + absentDays"
+        },
+        "remarks": {
+          "type": "String",
+          "required": false,
+          "trim": true
+        },
+        "createdAt": { "type": "Date", "auto": true },
+        "updatedAt": { "type": "Date", "auto": true }
+      },
+      "indexes": [
+        { "fields": { "employee": 1, "month": 1, "year": 1 }, "options": { "unique": true } },
+        { "fields": { "month": 1, "year": 1 } }
+      ],
+      "hooks": {
+        "preSave": "Calculate payableDays and lossOfPayDays before saving"
+      }
+    },
+    "payruns": {
+      "description": "Monthly payroll batch records",
+      "fields": {
+        "_id": { "type": "ObjectId", "primaryKey": true },
+        "month": {
+          "type": "String",
+          "required": true,
+          "enum": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+        },
+        "year": {
+          "type": "String",
+          "required": true
+        },
+        "generatedBy": {
+          "type": "ObjectId",
+          "ref": "User",
+          "required": false
+        },
+        "employeeCount": {
+          "type": "Number",
+          "required": true
+        },
+        "totalGross": {
+          "type": "Number",
+          "required": true
+        },
+        "totalDeductions": {
+          "type": "Number",
+          "required": true
+        },
+        "totalNetPay": {
+          "type": "Number",
+          "required": true
+        },
+        "generatedAt": {
+          "type": "Date",
+          "default": "Date.now"
+        },
+        "createdAt": { "type": "Date", "auto": true },
+        "updatedAt": { "type": "Date", "auto": true }
+      },
+      "indexes": [
+        { "fields": { "month": 1, "year": 1 }, "options": { "unique": true } }
+      ]
+    },
+    "payrunrecords": {
+      "description": "Individual employee records within a pay run",
+      "fields": {
+        "_id": { "type": "ObjectId", "primaryKey": true },
+        "payrun": {
+          "type": "ObjectId",
+          "ref": "PayRun",
+          "required": true
+        },
+        "employee": {
+          "type": "ObjectId",
+          "ref": "Employee",
+          "required": true
+        },
+        "employeeName": {
+          "type": "String",
+          "required": true,
+          "description": "Denormalized"
+        },
+        "basicSalary": { "type": "Number", "required": true },
+        "hra": { "type": "Number", "required": true },
+        "conveyance": { "type": "Number", "default": 0 },
+        "telephone": { "type": "Number", "default": 0 },
+        "medicalAllowance": { "type": "Number", "default": 0 },
+        "specialAllowance": { "type": "Number", "default": 0 },
+        "totalAllowances": { "type": "Number", "required": true },
+        "grossSalary": { "type": "Number", "required": true },
+        "totalWorkingDays": { "type": "Number", "required": true },
+        "payableDays": { "type": "Number", "required": true },
+        "lossOfPayDays": { "type": "Number", "required": true },
+        "lossOfPayAmount": { "type": "Number", "required": true },
+        "advanceDeduction": { "type": "Number", "default": 0 },
+        "loanDeduction": { "type": "Number", "default": 0 },
+        "pfDeduction": { "type": "Number", "default": 0 },
+        "esiDeduction": { "type": "Number", "default": 0 },
+        "professionalTax": { "type": "Number", "default": 0 },
+        "tds": { "type": "Number", "default": 0 },
+        "totalDeductions": { "type": "Number", "required": true },
+        "netPay": { "type": "Number", "required": true },
+        "createdAt": { "type": "Date", "auto": true },
+        "updatedAt": { "type": "Date", "auto": true }
+      },
+      "indexes": [
+        { "fields": { "payrun": 1 } },
+        { "fields": { "employee": 1 } }
+      ]
+    },
+    "advances": {
+      "description": "Salary advance records",
+      "fields": {
+        "_id": { "type": "ObjectId", "primaryKey": true },
+        "employee": {
+          "type": "ObjectId",
+          "ref": "Employee",
+          "required": true
+        },
+        "employeeName": {
+          "type": "String",
+          "required": true,
+          "description": "Denormalized"
+        },
+        "advanceMonth": {
+          "type": "String",
+          "required": true,
+          "description": "Month when advance was paid"
+        },
+        "advanceYear": {
+          "type": "String",
+          "required": true
+        },
+        "advancePaidAmount": {
+          "type": "Number",
+          "required": true,
+          "min": 0
+        },
+        "advanceDeductionMonth": {
+          "type": "String",
+          "required": true,
+          "description": "Month when advance will be deducted"
+        },
+        "advanceDeductionYear": {
+          "type": "String",
+          "required": true
+        },
+        "remarks": {
+          "type": "String",
+          "required": false,
+          "trim": true
+        },
+        "status": {
+          "type": "String",
+          "required": true,
+          "enum": ["pending", "deducted", "partial"],
+          "default": "pending"
+        },
+        "remainingAmount": {
+          "type": "Number",
+          "required": true
+        },
+        "createdAt": { "type": "Date", "auto": true },
+        "updatedAt": { "type": "Date", "auto": true }
+      },
+      "indexes": [
+        { "fields": { "employee": 1 } },
+        { "fields": { "advanceDeductionMonth": 1, "advanceDeductionYear": 1 } },
+        { "fields": { "status": 1 } }
+      ]
+    },
+    "loans": {
+      "description": "Employee loan records",
+      "fields": {
+        "_id": { "type": "ObjectId", "primaryKey": true },
+        "employee": {
+          "type": "ObjectId",
+          "ref": "Employee",
+          "required": true
+        },
+        "employeeName": {
+          "type": "String",
+          "required": true,
+          "description": "Denormalized"
+        },
+        "loanAmount": {
+          "type": "Number",
+          "required": true,
+          "min": 0
+        },
+        "interestRate": {
+          "type": "Number",
+          "default": 0,
+          "min": 0,
+          "description": "Interest rate percentage"
+        },
+        "numberOfEMIs": {
+          "type": "Number",
+          "required": true,
+          "min": 1
+        },
+        "emiAmount": {
+          "type": "Number",
+          "required": true,
+          "description": "Calculated: totalAmount / numberOfEMIs"
+        },
+        "totalAmount": {
+          "type": "Number",
+          "required": true,
+          "description": "loanAmount + interest"
+        },
+        "startMonth": {
+          "type": "String",
+          "required": true
+        },
+        "startYear": {
+          "type": "String",
+          "required": true
+        },
+        "totalPaidEMIs": {
+          "type": "Number",
+          "default": 0
+        },
+        "remainingBalance": {
+          "type": "Number",
+          "required": true
+        },
+        "status": {
+          "type": "String",
+          "required": true,
+          "enum": ["active", "completed", "cancelled"],
+          "default": "active"
+        },
+        "remarks": {
+          "type": "String",
+          "required": false,
+          "trim": true
+        },
+        "createdAt": { "type": "Date", "auto": true },
+        "updatedAt": { "type": "Date", "auto": true }
+      },
+      "indexes": [
+        { "fields": { "employee": 1 } },
+        { "fields": { "status": 1 } }
+      ]
+    },
+    "loanemis": {
+      "description": "Individual EMI records for loans",
+      "fields": {
+        "_id": { "type": "ObjectId", "primaryKey": true },
+        "loan": {
+          "type": "ObjectId",
+          "ref": "Loan",
+          "required": true
+        },
+        "month": {
+          "type": "String",
+          "required": true
+        },
+        "year": {
+          "type": "String",
+          "required": true
+        },
+        "emiAmount": {
+          "type": "Number",
+          "required": true
+        },
+        "status": {
+          "type": "String",
+          "required": true,
+          "enum": ["pending", "paid"],
+          "default": "pending"
+        },
+        "paidDate": {
+          "type": "Date",
+          "required": false
+        },
+        "createdAt": { "type": "Date", "auto": true },
+        "updatedAt": { "type": "Date", "auto": true }
+      },
+      "indexes": [
+        { "fields": { "loan": 1 } },
+        { "fields": { "month": 1, "year": 1 } },
+        { "fields": { "status": 1 } }
+      ]
+    }
+  },
+  "relationships": {
+    "departmentToEmployees": {
+      "type": "one-to-many",
+      "from": "departments",
+      "to": "employees",
+      "foreignKey": "employees.employmentDetails.department",
+      "onDelete": "restrict",
+      "description": "One department has many employees"
+    },
+    "departmentToDesignations": {
+      "type": "one-to-many",
+      "from": "departments",
+      "to": "designations",
+      "foreignKey": "designations.department",
+      "onDelete": "restrict",
+      "description": "One department has many designations"
+    },
+    "designationToEmployees": {
+      "type": "one-to-many",
+      "from": "designations",
+      "to": "employees",
+      "foreignKey": "employees.employmentDetails.designation",
+      "onDelete": "restrict",
+      "description": "One designation can be held by many employees"
+    },
+    "employeeToReportingManager": {
+      "type": "many-to-one",
+      "from": "employees",
+      "to": "employees",
+      "foreignKey": "employees.employmentDetails.reportingManager",
+      "onDelete": "setNull",
+      "selfReferential": true,
+      "description": "Employee reports to another employee"
+    },
+    "employeeToAttendances": {
+      "type": "one-to-many",
+      "from": "employees",
+      "to": "attendances",
+      "foreignKey": "attendances.employee",
+      "onDelete": "cascade",
+      "description": "One employee has many attendance records"
+    },
+    "employeeToAdvances": {
+      "type": "one-to-many",
+      "from": "employees",
+      "to": "advances",
+      "foreignKey": "advances.employee",
+      "onDelete": "cascade",
+      "description": "One employee can have many advances"
+    },
+    "employeeToLoans": {
+      "type": "one-to-many",
+      "from": "employees",
+      "to": "loans",
+      "foreignKey": "loans.employee",
+      "onDelete": "cascade",
+      "description": "One employee can have many loans"
+    },
+    "payrunToRecords": {
+      "type": "one-to-many",
+      "from": "payruns",
+      "to": "payrunrecords",
+      "foreignKey": "payrunrecords.payrun",
+      "onDelete": "cascade",
+      "description": "One pay run has many employee records"
+    },
+    "loanToEMIs": {
+      "type": "one-to-many",
+      "from": "loans",
+      "to": "loanemis",
+      "foreignKey": "loanemis.loan",
+      "onDelete": "cascade",
+      "description": "One loan has many EMI records"
+    }
+  },
+  "businessRules": {
+    "salaryCalculation": {
+      "basicCalculation": {
+        "formula": "basic = (ctc * 0.50) / 12",
+        "description": "Monthly basic is 50% of annual CTC divided by 12"
+      },
+      "hraCalculation": {
+        "formula": "hra = basic * (hraPercentage / 100)",
+        "description": "HRA is percentage of basic"
+      },
+      "pfCalculation": {
+        "formula": "pfDeduction = min(basic, 15000) * 0.12",
+        "description": "PF is 12% of basic, capped at 15000 wage ceiling"
+      },
+      "esiCalculation": {
+        "condition": "gross < 21000",
+        "formula": "esiDeduction = gross * 0.0075",
+        "employerFormula": "employerESI = gross * 0.0325",
+        "description": "ESI applicable only if gross < 21000"
+      },
+      "professionalTaxCalculation": {
+        "condition": "gross > 25000",
+        "formula": "professionalTax = 200",
+        "description": "PT is 200 if gross exceeds 25000"
+      },
+      "specialAllowanceCalculation": {
+        "formula": "specialAllowance = monthlyCtc - basic - hra - conveyance - telephone - medical - employerPF",
+        "description": "Special allowance is the balancing component"
+      },
+      "netCalculation": {
+        "formula": "net = gross - pfDeduction - esiDeduction - professionalTax - tdsMonthly",
+        "description": "Net is gross minus all deductions"
+      }
+    },
+    "attendanceCalculation": {
+      "payableDays": {
+        "formula": "payableDays = presentDays + paidLeave",
+        "description": "Days eligible for salary"
+      },
+      "lossOfPayDays": {
+        "formula": "lossOfPayDays = unpaidLeave + absentDays",
+        "description": "Days to deduct from salary"
+      },
+      "lopDeduction": {
+        "formula": "lopAmount = (basic / totalWorkingDays) * lossOfPayDays",
+        "description": "LOP deduction based on per-day salary"
+      }
+    },
+    "loanCalculation": {
+      "emiCalculation": {
+        "formula": "emiAmount = (loanAmount + (loanAmount * interestRate / 100)) / numberOfEMIs",
+        "description": "Simple interest EMI calculation"
+      }
+    },
+    "employeeIdGeneration": {
+      "formula": "newId = max(existingIds) + 1",
+      "format": "Plain numeric string (1, 2, 3...)",
+      "description": "Sequential numeric IDs starting from 1"
+    },
+    "officialEmailGeneration": {
+      "formula": "officialEmail = `${firstName.toLowerCase()}.${lastName.toLowerCase()}@ecovale.com`",
+      "description": "Auto-generated from employee name"
+    }
+  },
+  "constants": {
+    "BASIC_PCT_OF_CTC": 0.50,
+    "PF_WAGE_CEILING_MONTHLY": 15000,
+    "PF_EMPLOYEE_RATE": 0.12,
+    "PF_EMPLOYER_RATE": 0.12,
+    "ESI_EMPLOYEE_RATE": 0.0075,
+    "ESI_EMPLOYER_RATE": 0.0325,
+    "ESI_WAGE_CEILING_MONTHLY": 21000,
+    "EMPLOYEE_HEALTH_INSURANCE_ANNUAL": 1000,
+    "GRATUITY_RATE_ANNUAL": 0.0481,
+    "DEFAULT_PROBATION_MONTHS": 6,
+    "DEFAULT_WORKING_DAYS": 26
+  },
+  "assumptions": [
+    "All monetary values are in Indian Rupees (INR)",
+    "Date/time values are stored in UTC",
+    "PF and ESI calculations follow Indian statutory requirements",
+    "Employee IDs are sequential and never reused",
+    "Official email domain is always @ecovale.com",
+    "Maximum file upload size is 5MB",
+    "Documents are stored as Base64 for simplicity",
+    "Single-tenant application (one company)"
+  ]
+}

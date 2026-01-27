@@ -5,28 +5,32 @@ import {
 } from 'lucide-react';
 import { useAppContext } from '../../contexts/AppContext';
 import { Page } from '../../types';
+import { hasRole, hasAnyRole, isAdmin } from '../../services/authService';
 
 interface SidebarProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
 }
 
+// Menu items with role-based access control
+// requiredRoles: array of roles that can access this item
+// if not specified, all authenticated users can access
 const menuItems = [
-  { icon: LayoutDashboard, label: 'Dashboard', page: 'dashboard' },
-  { icon: Users, label: 'Employees', page: 'employees' },
-  { icon: UserPlus, label: 'New Employee', page: 'new-employee' },
-  { icon: Target, label: 'Designations', page: 'designations' },
-  { icon: UserPlus, label: 'Onboarding', page: 'onboarding' },
-  { icon: FileText, label: 'Letters', page: 'letters' },
-  { icon: FileText, label: 'Documents', page: 'documents' },
-  { icon: Banknote, label: 'Payroll', page: 'payroll' },
-  { icon: UserCheck, label: 'Attendance Register', page: 'attendance-register' },
-  { icon: DollarSign, label: 'Advance Register', page: 'advance-register' },
-  { icon: CreditCard, label: 'Loan Register', page: 'loan-register' },
-  { icon: PlayCircle, label: 'Pay Run', page: 'pay-run' },
-  { icon: Calculator, label: 'ESI/PF Calculator', page: 'calculator' },
-  { icon: TrendingUp, label: 'Career Management', page: 'career' },
-  { icon: Settings, label: 'Settings', page: 'settings' },
+  { icon: LayoutDashboard, label: 'Dashboard', page: 'dashboard', requiredRoles: ['ROLE_USER', 'ROLE_ADMIN'] },
+  { icon: Users, label: 'Employees', page: 'employees', requiredRoles: ['ROLE_ADMIN'] }, // Admin only
+  { icon: UserPlus, label: 'New Employee', page: 'new-employee', requiredRoles: ['ROLE_ADMIN'] }, // Admin only
+  { icon: Target, label: 'Designations', page: 'designations', requiredRoles: ['ROLE_ADMIN'] }, // Admin only
+  { icon: UserPlus, label: 'Onboarding', page: 'onboarding', requiredRoles: ['ROLE_USER', 'ROLE_ADMIN'] },
+  { icon: FileText, label: 'Letters', page: 'letters', requiredRoles: ['ROLE_USER', 'ROLE_ADMIN'] },
+  { icon: FileText, label: 'Documents', page: 'documents', requiredRoles: ['ROLE_USER', 'ROLE_ADMIN'] },
+  { icon: Banknote, label: 'Payroll', page: 'payroll', requiredRoles: ['ROLE_ADMIN'] }, // Admin only
+  { icon: UserCheck, label: 'Attendance Register', page: 'attendance-register', requiredRoles: ['ROLE_USER', 'ROLE_ADMIN'] },
+  { icon: DollarSign, label: 'Advance Register', page: 'advance-register', requiredRoles: ['ROLE_ADMIN'] }, // Admin only
+  { icon: CreditCard, label: 'Loan Register', page: 'loan-register', requiredRoles: ['ROLE_ADMIN'] }, // Admin only
+  { icon: PlayCircle, label: 'Pay Run', page: 'pay-run', requiredRoles: ['ROLE_ADMIN'] }, // Admin only
+  { icon: Calculator, label: 'ESI/PF Calculator', page: 'calculator', requiredRoles: ['ROLE_USER', 'ROLE_ADMIN'] },
+  { icon: TrendingUp, label: 'Career Management', page: 'career', requiredRoles: ['ROLE_USER', 'ROLE_ADMIN'] },
+  { icon: Settings, label: 'Settings', page: 'settings', requiredRoles: ['ROLE_ADMIN'] }, // Admin only
 ];
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
@@ -63,25 +67,42 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
         </div>
         <nav>
           <ul>
-            {menuItems.map((item) => (
-              <li key={item.page}>
-                <a
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleNavClick(item.page as Page);
-                  }}
-                  className={`flex items-center space-x-3 p-2 rounded-lg transition-colors ${
-                    activePage === item.page
-                      ? 'bg-green-100 text-green-700 font-semibold'
-                      : 'text-gray-600 hover:bg-gray-100'
-                  }`}
-                >
-                  <item.icon size={20} />
-                  <span>{item.label}</span>
-                </a>
-              </li>
-            ))}
+            {menuItems.map((item) => {
+              // Check if user has required roles to see this menu item
+              const hasAccess = !item.requiredRoles || hasAnyRole(item.requiredRoles);
+              
+              // Don't render if user doesn't have access
+              if (!hasAccess) {
+                return null;
+              }
+
+              return (
+                <li key={item.page}>
+                  <a
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleNavClick(item.page as Page);
+                    }}
+                    className={`flex items-center space-x-3 p-2 rounded-lg transition-colors ${
+                      activePage === item.page
+                        ? 'bg-green-100 text-green-700 font-semibold'
+                        : 'text-gray-600 hover:bg-gray-100'
+                    }`}
+                  >
+                    <item.icon size={20} />
+                    <span>{item.label}</span>
+                    {/* Admin badge for admin-only items */}
+                    {item.requiredRoles?.includes('ROLE_ADMIN') && 
+                     item.requiredRoles.length === 1 && (
+                      <span className="ml-auto text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded">
+                        Admin
+                      </span>
+                    )}
+                  </a>
+                </li>
+              );
+            })}
           </ul>
         </nav>
       </aside>
