@@ -61,6 +61,7 @@ ecovale-hr-management/
 │   ├── .env.example              # Environment variables template
 │   └── package.json
 ├── netlify.toml                  # Netlify deployment configuration
+├── vercel.json                   # Vercel deployment configuration
 ├── package.json                  # Root package.json for deployment
 └── README.md
 ```
@@ -202,6 +203,22 @@ This project is configured for easy deployment to Netlify:
 3. **Environment Variables**:
    Configure in Netlify UI under Site settings → Build & deploy → Environment:
    - `REACT_APP_API_URL`: Your backend API URL (e.g., `https://api.yourdomain.com/api`)
+
+### Deploying to Vercel
+
+This project includes a `vercel.json` configuration file for deployment:
+
+1. **Automatic Configuration**: The `vercel.json` file specifies:
+   - Build command: Automatically builds from the `frontend/` directory
+   - Output directory: `frontend/build`
+   - SPA rewrites configured
+
+2. **Environment Variables**:
+   Configure in Vercel UI under Project Settings → Environment Variables:
+   - Variable name: `REACT_APP_API_URL`
+   - Value: Your backend API URL (e.g., `https://api.yourdomain.com/api`)
+   
+   **Important**: This is a Create React App project, which uses the `REACT_APP_` prefix for environment variables, **NOT** `VITE_`. Do not use `VITE_API_BASE_URL` or similar Vite-style variable names.
 
 ### Deploying the Backend
 
