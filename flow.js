@@ -1,658 +1,495 @@
 "use strict";
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
+var _core = require("./core.js");
+var _utils = require("./utils.js");
+const defineType = (0, _utils.defineAliasedType)("Flow");
+const defineInterfaceishType = name => {
+  const isDeclareClass = name === "DeclareClass";
+  defineType(name, {
+    builder: ["id", "typeParameters", "extends", "body"],
+    visitor: ["id", "typeParameters", "extends", ...(isDeclareClass ? ["mixins", "implements"] : []), "body"],
+    aliases: ["FlowDeclaration", "Statement", "Declaration"],
+    fields: Object.assign({
+      id: (0, _utils.validateType)("Identifier"),
+      typeParameters: (0, _utils.validateOptionalType)("TypeParameterDeclaration"),
+      extends: (0, _utils.validateOptional)((0, _utils.arrayOfType)("InterfaceExtends"))
+    }, isDeclareClass ? {
+      mixins: (0, _utils.validateOptional)((0, _utils.arrayOfType)("InterfaceExtends")),
+      implements: (0, _utils.validateOptional)((0, _utils.arrayOfType)("ClassImplements"))
+    } : {}, {
+      body: (0, _utils.validateType)("ObjectTypeAnnotation")
+    })
+  });
+};
+defineType("AnyTypeAnnotation", {
+  aliases: ["FlowType", "FlowBaseAnnotation"]
 });
-exports.AnyTypeAnnotation = AnyTypeAnnotation;
-exports.ArrayTypeAnnotation = ArrayTypeAnnotation;
-exports.BooleanLiteralTypeAnnotation = BooleanLiteralTypeAnnotation;
-exports.BooleanTypeAnnotation = BooleanTypeAnnotation;
-exports.DeclareClass = DeclareClass;
-exports.DeclareExportAllDeclaration = DeclareExportAllDeclaration;
-exports.DeclareExportDeclaration = DeclareExportDeclaration;
-exports.DeclareFunction = DeclareFunction;
-exports.DeclareInterface = DeclareInterface;
-exports.DeclareModule = DeclareModule;
-exports.DeclareModuleExports = DeclareModuleExports;
-exports.DeclareOpaqueType = DeclareOpaqueType;
-exports.DeclareTypeAlias = DeclareTypeAlias;
-exports.DeclareVariable = DeclareVariable;
-exports.DeclaredPredicate = DeclaredPredicate;
-exports.EmptyTypeAnnotation = EmptyTypeAnnotation;
-exports.EnumBooleanBody = EnumBooleanBody;
-exports.EnumBooleanMember = EnumBooleanMember;
-exports.EnumDeclaration = EnumDeclaration;
-exports.EnumDefaultedMember = EnumDefaultedMember;
-exports.EnumNumberBody = EnumNumberBody;
-exports.EnumNumberMember = EnumNumberMember;
-exports.EnumStringBody = EnumStringBody;
-exports.EnumStringMember = EnumStringMember;
-exports.EnumSymbolBody = EnumSymbolBody;
-exports.ExistsTypeAnnotation = ExistsTypeAnnotation;
-exports.FunctionTypeAnnotation = FunctionTypeAnnotation;
-exports.FunctionTypeParam = FunctionTypeParam;
-exports.IndexedAccessType = IndexedAccessType;
-exports.InferredPredicate = InferredPredicate;
-exports.InterfaceDeclaration = InterfaceDeclaration;
-exports.GenericTypeAnnotation = exports.ClassImplements = exports.InterfaceExtends = InterfaceExtends;
-exports.InterfaceTypeAnnotation = InterfaceTypeAnnotation;
-exports.IntersectionTypeAnnotation = IntersectionTypeAnnotation;
-exports.MixedTypeAnnotation = MixedTypeAnnotation;
-exports.NullLiteralTypeAnnotation = NullLiteralTypeAnnotation;
-exports.NullableTypeAnnotation = NullableTypeAnnotation;
-Object.defineProperty(exports, "NumberLiteralTypeAnnotation", {
-  enumerable: true,
-  get: function () {
-    return _types2.NumericLiteral;
+defineType("ArrayTypeAnnotation", {
+  visitor: ["elementType"],
+  aliases: ["FlowType"],
+  fields: {
+    elementType: (0, _utils.validateType)("FlowType")
   }
 });
-exports.NumberTypeAnnotation = NumberTypeAnnotation;
-exports.ObjectTypeAnnotation = ObjectTypeAnnotation;
-exports.ObjectTypeCallProperty = ObjectTypeCallProperty;
-exports.ObjectTypeIndexer = ObjectTypeIndexer;
-exports.ObjectTypeInternalSlot = ObjectTypeInternalSlot;
-exports.ObjectTypeProperty = ObjectTypeProperty;
-exports.ObjectTypeSpreadProperty = ObjectTypeSpreadProperty;
-exports.OpaqueType = OpaqueType;
-exports.OptionalIndexedAccessType = OptionalIndexedAccessType;
-exports.QualifiedTypeIdentifier = QualifiedTypeIdentifier;
-Object.defineProperty(exports, "StringLiteralTypeAnnotation", {
-  enumerable: true,
-  get: function () {
-    return _types2.StringLiteral;
+defineType("BooleanTypeAnnotation", {
+  aliases: ["FlowType", "FlowBaseAnnotation"]
+});
+defineType("BooleanLiteralTypeAnnotation", {
+  builder: ["value"],
+  aliases: ["FlowType"],
+  fields: {
+    value: (0, _utils.validate)((0, _utils.assertValueType)("boolean"))
   }
 });
-exports.StringTypeAnnotation = StringTypeAnnotation;
-exports.SymbolTypeAnnotation = SymbolTypeAnnotation;
-exports.ThisTypeAnnotation = ThisTypeAnnotation;
-exports.TupleTypeAnnotation = TupleTypeAnnotation;
-exports.TypeAlias = TypeAlias;
-exports.TypeAnnotation = TypeAnnotation;
-exports.TypeCastExpression = TypeCastExpression;
-exports.TypeParameter = TypeParameter;
-exports.TypeParameterDeclaration = exports.TypeParameterInstantiation = TypeParameterInstantiation;
-exports.TypeofTypeAnnotation = TypeofTypeAnnotation;
-exports.UnionTypeAnnotation = UnionTypeAnnotation;
-exports.Variance = Variance;
-exports.VoidTypeAnnotation = VoidTypeAnnotation;
-exports._interfaceish = _interfaceish;
-exports._variance = _variance;
-var _t = require("@babel/types");
-var _modules = require("./modules.js");
-var _index = require("../node/index.js");
-var _types2 = require("./types.js");
-const {
-  isDeclareExportDeclaration,
-  isStatement
-} = _t;
-function AnyTypeAnnotation() {
-  this.word("any");
-}
-function ArrayTypeAnnotation(node) {
-  this.print(node.elementType, true);
-  this.tokenChar(91);
-  this.tokenChar(93);
-}
-function BooleanTypeAnnotation() {
-  this.word("boolean");
-}
-function BooleanLiteralTypeAnnotation(node) {
-  this.word(node.value ? "true" : "false");
-}
-function NullLiteralTypeAnnotation() {
-  this.word("null");
-}
-function DeclareClass(node, parent) {
-  if (!isDeclareExportDeclaration(parent)) {
-    this.word("declare");
-    this.space();
+defineType("NullLiteralTypeAnnotation", {
+  aliases: ["FlowType", "FlowBaseAnnotation"]
+});
+defineType("ClassImplements", {
+  visitor: ["id", "typeParameters"],
+  fields: {
+    id: (0, _utils.validateType)("Identifier"),
+    typeParameters: (0, _utils.validateOptionalType)("TypeParameterInstantiation")
   }
-  this.word("class");
-  this.space();
-  this._interfaceish(node);
-}
-function DeclareFunction(node, parent) {
-  if (!isDeclareExportDeclaration(parent)) {
-    this.word("declare");
-    this.space();
+});
+defineInterfaceishType("DeclareClass");
+defineType("DeclareFunction", {
+  builder: ["id"],
+  visitor: ["id", "predicate"],
+  aliases: ["FlowDeclaration", "Statement", "Declaration"],
+  fields: {
+    id: (0, _utils.validateType)("Identifier"),
+    predicate: (0, _utils.validateOptionalType)("DeclaredPredicate")
   }
-  this.word("function");
-  this.space();
-  this.print(node.id);
-  this.print(node.id.typeAnnotation.typeAnnotation);
-  if (node.predicate) {
-    this.space();
-    this.print(node.predicate);
+});
+defineInterfaceishType("DeclareInterface");
+defineType("DeclareModule", {
+  builder: ["id", "body", "kind"],
+  visitor: ["id", "body"],
+  aliases: ["FlowDeclaration", "Statement", "Declaration"],
+  fields: {
+    id: (0, _utils.validateType)("Identifier", "StringLiteral"),
+    body: (0, _utils.validateType)("BlockStatement"),
+    kind: (0, _utils.validateOptional)((0, _utils.assertOneOf)("CommonJS", "ES"))
   }
-  this.semicolon();
-}
-function InferredPredicate() {
-  this.tokenChar(37);
-  this.word("checks");
-}
-function DeclaredPredicate(node) {
-  this.tokenChar(37);
-  this.word("checks");
-  this.tokenChar(40);
-  this.print(node.value);
-  this.tokenChar(41);
-}
-function DeclareInterface(node) {
-  this.word("declare");
-  this.space();
-  this.InterfaceDeclaration(node);
-}
-function DeclareModule(node) {
-  this.word("declare");
-  this.space();
-  this.word("module");
-  this.space();
-  this.print(node.id);
-  this.space();
-  this.print(node.body);
-}
-function DeclareModuleExports(node) {
-  this.word("declare");
-  this.space();
-  this.word("module");
-  this.tokenChar(46);
-  this.word("exports");
-  this.print(node.typeAnnotation);
-}
-function DeclareTypeAlias(node) {
-  this.word("declare");
-  this.space();
-  this.TypeAlias(node);
-}
-function DeclareOpaqueType(node, parent) {
-  if (!isDeclareExportDeclaration(parent)) {
-    this.word("declare");
-    this.space();
+});
+defineType("DeclareModuleExports", {
+  visitor: ["typeAnnotation"],
+  aliases: ["FlowDeclaration", "Statement", "Declaration"],
+  fields: {
+    typeAnnotation: (0, _utils.validateType)("TypeAnnotation")
   }
-  this.OpaqueType(node);
-}
-function DeclareVariable(node, parent) {
-  if (!isDeclareExportDeclaration(parent)) {
-    this.word("declare");
-    this.space();
+});
+defineType("DeclareTypeAlias", {
+  visitor: ["id", "typeParameters", "right"],
+  aliases: ["FlowDeclaration", "Statement", "Declaration"],
+  fields: {
+    id: (0, _utils.validateType)("Identifier"),
+    typeParameters: (0, _utils.validateOptionalType)("TypeParameterDeclaration"),
+    right: (0, _utils.validateType)("FlowType")
   }
-  this.word("var");
-  this.space();
-  this.print(node.id);
-  this.print(node.id.typeAnnotation);
-  this.semicolon();
-}
-function DeclareExportDeclaration(node) {
-  this.word("declare");
-  this.space();
-  this.word("export");
-  this.space();
-  if (node.default) {
-    this.word("default");
-    this.space();
+});
+defineType("DeclareOpaqueType", {
+  visitor: ["id", "typeParameters", "supertype"],
+  aliases: ["FlowDeclaration", "Statement", "Declaration"],
+  fields: {
+    id: (0, _utils.validateType)("Identifier"),
+    typeParameters: (0, _utils.validateOptionalType)("TypeParameterDeclaration"),
+    supertype: (0, _utils.validateOptionalType)("FlowType"),
+    impltype: (0, _utils.validateOptionalType)("FlowType")
   }
-  FlowExportDeclaration.call(this, node);
-}
-function DeclareExportAllDeclaration(node) {
-  this.word("declare");
-  this.space();
-  _modules.ExportAllDeclaration.call(this, node);
-}
-function EnumDeclaration(node) {
-  const {
-    id,
-    body
-  } = node;
-  this.word("enum");
-  this.space();
-  this.print(id);
-  this.print(body);
-}
-function enumExplicitType(context, name, hasExplicitType) {
-  if (hasExplicitType) {
-    context.space();
-    context.word("of");
-    context.space();
-    context.word(name);
+});
+defineType("DeclareVariable", {
+  visitor: ["id"],
+  aliases: ["FlowDeclaration", "Statement", "Declaration"],
+  fields: {
+    id: (0, _utils.validateType)("Identifier")
   }
-  context.space();
-}
-function enumBody(context, node) {
-  const {
-    members
-  } = node;
-  context.token("{");
-  context.indent();
-  context.newline();
-  for (const member of members) {
-    context.print(member);
-    context.newline();
+});
+defineType("DeclareExportDeclaration", {
+  visitor: ["declaration", "specifiers", "source", "attributes"],
+  aliases: ["FlowDeclaration", "Statement", "Declaration"],
+  fields: Object.assign({
+    declaration: (0, _utils.validateOptionalType)("Flow"),
+    specifiers: (0, _utils.validateOptional)((0, _utils.arrayOfType)("ExportSpecifier", "ExportNamespaceSpecifier")),
+    source: (0, _utils.validateOptionalType)("StringLiteral"),
+    default: (0, _utils.validateOptional)((0, _utils.assertValueType)("boolean"))
+  }, _core.importAttributes)
+});
+defineType("DeclareExportAllDeclaration", {
+  visitor: ["source", "attributes"],
+  aliases: ["FlowDeclaration", "Statement", "Declaration"],
+  fields: Object.assign({
+    source: (0, _utils.validateType)("StringLiteral"),
+    exportKind: (0, _utils.validateOptional)((0, _utils.assertOneOf)("type", "value"))
+  }, _core.importAttributes)
+});
+defineType("DeclaredPredicate", {
+  visitor: ["value"],
+  aliases: ["FlowPredicate"],
+  fields: {
+    value: (0, _utils.validateType)("Flow")
   }
-  if (node.hasUnknownMembers) {
-    context.token("...");
-    context.newline();
+});
+defineType("ExistsTypeAnnotation", {
+  aliases: ["FlowType"]
+});
+defineType("FunctionTypeAnnotation", {
+  builder: ["typeParameters", "params", "rest", "returnType"],
+  visitor: ["typeParameters", "this", "params", "rest", "returnType"],
+  aliases: ["FlowType"],
+  fields: {
+    typeParameters: (0, _utils.validateOptionalType)("TypeParameterDeclaration"),
+    params: (0, _utils.validateArrayOfType)("FunctionTypeParam"),
+    rest: (0, _utils.validateOptionalType)("FunctionTypeParam"),
+    this: (0, _utils.validateOptionalType)("FunctionTypeParam"),
+    returnType: (0, _utils.validateType)("FlowType")
   }
-  context.dedent();
-  context.token("}");
-}
-function EnumBooleanBody(node) {
-  const {
-    explicitType
-  } = node;
-  enumExplicitType(this, "boolean", explicitType);
-  enumBody(this, node);
-}
-function EnumNumberBody(node) {
-  const {
-    explicitType
-  } = node;
-  enumExplicitType(this, "number", explicitType);
-  enumBody(this, node);
-}
-function EnumStringBody(node) {
-  const {
-    explicitType
-  } = node;
-  enumExplicitType(this, "string", explicitType);
-  enumBody(this, node);
-}
-function EnumSymbolBody(node) {
-  enumExplicitType(this, "symbol", true);
-  enumBody(this, node);
-}
-function EnumDefaultedMember(node) {
-  const {
-    id
-  } = node;
-  this.print(id);
-  this.tokenChar(44);
-}
-function enumInitializedMember(context, node) {
-  context.print(node.id);
-  context.space();
-  context.token("=");
-  context.space();
-  context.print(node.init);
-  context.token(",");
-}
-function EnumBooleanMember(node) {
-  enumInitializedMember(this, node);
-}
-function EnumNumberMember(node) {
-  enumInitializedMember(this, node);
-}
-function EnumStringMember(node) {
-  enumInitializedMember(this, node);
-}
-function FlowExportDeclaration(node) {
-  if (node.declaration) {
-    const declar = node.declaration;
-    this.print(declar);
-    if (!isStatement(declar)) this.semicolon();
-  } else {
-    this.tokenChar(123);
-    if (node.specifiers.length) {
-      this.space();
-      this.printList(node.specifiers);
-      this.space();
-    }
-    this.tokenChar(125);
-    if (node.source) {
-      this.space();
-      this.word("from");
-      this.space();
-      this.print(node.source);
-    }
-    this.semicolon();
+});
+defineType("FunctionTypeParam", {
+  visitor: ["name", "typeAnnotation"],
+  fields: {
+    name: (0, _utils.validateOptionalType)("Identifier"),
+    typeAnnotation: (0, _utils.validateType)("FlowType"),
+    optional: (0, _utils.validateOptional)((0, _utils.assertValueType)("boolean"))
   }
-}
-function ExistsTypeAnnotation() {
-  this.tokenChar(42);
-}
-function FunctionTypeAnnotation(node, parent) {
-  this.print(node.typeParameters);
-  this.tokenChar(40);
-  if (node.this) {
-    this.word("this");
-    this.tokenChar(58);
-    this.space();
-    this.print(node.this.typeAnnotation);
-    if (node.params.length || node.rest) {
-      this.tokenChar(44);
-      this.space();
-    }
+});
+defineType("GenericTypeAnnotation", {
+  visitor: ["id", "typeParameters"],
+  aliases: ["FlowType"],
+  fields: {
+    id: (0, _utils.validateType)("Identifier", "QualifiedTypeIdentifier"),
+    typeParameters: (0, _utils.validateOptionalType)("TypeParameterInstantiation")
   }
-  this.printList(node.params);
-  if (node.rest) {
-    if (node.params.length) {
-      this.tokenChar(44);
-      this.space();
-    }
-    this.token("...");
-    this.print(node.rest);
+});
+defineType("InferredPredicate", {
+  aliases: ["FlowPredicate"]
+});
+defineType("InterfaceExtends", {
+  visitor: ["id", "typeParameters"],
+  fields: {
+    id: (0, _utils.validateType)("Identifier", "QualifiedTypeIdentifier"),
+    typeParameters: (0, _utils.validateOptionalType)("TypeParameterInstantiation")
   }
-  this.tokenChar(41);
-  const type = parent == null ? void 0 : parent.type;
-  if (type != null && (type === "ObjectTypeCallProperty" || type === "ObjectTypeInternalSlot" || type === "DeclareFunction" || type === "ObjectTypeProperty" && parent.method)) {
-    this.tokenChar(58);
-  } else {
-    this.space();
-    this.token("=>");
+});
+defineInterfaceishType("InterfaceDeclaration");
+defineType("InterfaceTypeAnnotation", {
+  visitor: ["extends", "body"],
+  aliases: ["FlowType"],
+  fields: {
+    extends: (0, _utils.validateOptional)((0, _utils.arrayOfType)("InterfaceExtends")),
+    body: (0, _utils.validateType)("ObjectTypeAnnotation")
   }
-  this.space();
-  this.print(node.returnType);
-}
-function FunctionTypeParam(node) {
-  this.print(node.name);
-  if (node.optional) this.tokenChar(63);
-  if (node.name) {
-    this.tokenChar(58);
-    this.space();
+});
+defineType("IntersectionTypeAnnotation", {
+  visitor: ["types"],
+  aliases: ["FlowType"],
+  fields: {
+    types: (0, _utils.validate)((0, _utils.arrayOfType)("FlowType"))
   }
-  this.print(node.typeAnnotation);
-}
-function InterfaceExtends(node) {
-  this.print(node.id);
-  this.print(node.typeParameters, true);
-}
-function _interfaceish(node) {
-  var _node$extends;
-  this.print(node.id);
-  this.print(node.typeParameters);
-  if ((_node$extends = node.extends) != null && _node$extends.length) {
-    this.space();
-    this.word("extends");
-    this.space();
-    this.printList(node.extends);
+});
+defineType("MixedTypeAnnotation", {
+  aliases: ["FlowType", "FlowBaseAnnotation"]
+});
+defineType("EmptyTypeAnnotation", {
+  aliases: ["FlowType", "FlowBaseAnnotation"]
+});
+defineType("NullableTypeAnnotation", {
+  visitor: ["typeAnnotation"],
+  aliases: ["FlowType"],
+  fields: {
+    typeAnnotation: (0, _utils.validateType)("FlowType")
   }
-  if (node.type === "DeclareClass") {
-    var _node$mixins, _node$implements;
-    if ((_node$mixins = node.mixins) != null && _node$mixins.length) {
-      this.space();
-      this.word("mixins");
-      this.space();
-      this.printList(node.mixins);
-    }
-    if ((_node$implements = node.implements) != null && _node$implements.length) {
-      this.space();
-      this.word("implements");
-      this.space();
-      this.printList(node.implements);
-    }
+});
+defineType("NumberLiteralTypeAnnotation", {
+  builder: ["value"],
+  aliases: ["FlowType"],
+  fields: {
+    value: (0, _utils.validate)((0, _utils.assertValueType)("number"))
   }
-  this.space();
-  this.print(node.body);
-}
-function _variance(node) {
-  var _node$variance;
-  const kind = (_node$variance = node.variance) == null ? void 0 : _node$variance.kind;
-  if (kind != null) {
-    if (kind === "plus") {
-      this.tokenChar(43);
-    } else if (kind === "minus") {
-      this.tokenChar(45);
-    }
+});
+defineType("NumberTypeAnnotation", {
+  aliases: ["FlowType", "FlowBaseAnnotation"]
+});
+defineType("ObjectTypeAnnotation", {
+  visitor: ["properties", "indexers", "callProperties", "internalSlots"],
+  aliases: ["FlowType"],
+  builder: ["properties", "indexers", "callProperties", "internalSlots", "exact"],
+  fields: {
+    properties: (0, _utils.validate)((0, _utils.arrayOfType)("ObjectTypeProperty", "ObjectTypeSpreadProperty")),
+    indexers: {
+      validate: (0, _utils.arrayOfType)("ObjectTypeIndexer"),
+      optional: true,
+      default: []
+    },
+    callProperties: {
+      validate: (0, _utils.arrayOfType)("ObjectTypeCallProperty"),
+      optional: true,
+      default: []
+    },
+    internalSlots: {
+      validate: (0, _utils.arrayOfType)("ObjectTypeInternalSlot"),
+      optional: true,
+      default: []
+    },
+    exact: {
+      validate: (0, _utils.assertValueType)("boolean"),
+      default: false
+    },
+    inexact: (0, _utils.validateOptional)((0, _utils.assertValueType)("boolean"))
   }
-}
-function InterfaceDeclaration(node) {
-  this.word("interface");
-  this.space();
-  this._interfaceish(node);
-}
-function andSeparator(occurrenceCount) {
-  this.space();
-  this.token("&", false, occurrenceCount);
-  this.space();
-}
-function InterfaceTypeAnnotation(node) {
-  var _node$extends2;
-  this.word("interface");
-  if ((_node$extends2 = node.extends) != null && _node$extends2.length) {
-    this.space();
-    this.word("extends");
-    this.space();
-    this.printList(node.extends);
+});
+defineType("ObjectTypeInternalSlot", {
+  visitor: ["id", "value"],
+  builder: ["id", "value", "optional", "static", "method"],
+  aliases: ["UserWhitespacable"],
+  fields: {
+    id: (0, _utils.validateType)("Identifier"),
+    value: (0, _utils.validateType)("FlowType"),
+    optional: (0, _utils.validate)((0, _utils.assertValueType)("boolean")),
+    static: (0, _utils.validate)((0, _utils.assertValueType)("boolean")),
+    method: (0, _utils.validate)((0, _utils.assertValueType)("boolean"))
   }
-  this.space();
-  this.print(node.body);
-}
-function IntersectionTypeAnnotation(node) {
-  this.printJoin(node.types, undefined, undefined, andSeparator);
-}
-function MixedTypeAnnotation() {
-  this.word("mixed");
-}
-function EmptyTypeAnnotation() {
-  this.word("empty");
-}
-function NullableTypeAnnotation(node) {
-  this.tokenChar(63);
-  this.print(node.typeAnnotation);
-}
-function NumberTypeAnnotation() {
-  this.word("number");
-}
-function StringTypeAnnotation() {
-  this.word("string");
-}
-function ThisTypeAnnotation() {
-  this.word("this");
-}
-function TupleTypeAnnotation(node) {
-  this.tokenChar(91);
-  this.printList(node.types);
-  this.tokenChar(93);
-}
-function TypeofTypeAnnotation(node) {
-  this.word("typeof");
-  this.space();
-  this.print(node.argument);
-}
-function TypeAlias(node) {
-  this.word("type");
-  this.space();
-  this.print(node.id);
-  this.print(node.typeParameters);
-  this.space();
-  this.tokenChar(61);
-  this.space();
-  this.print(node.right);
-  this.semicolon();
-}
-function TypeAnnotation(node, parent) {
-  this.tokenChar(58);
-  this.space();
-  if (parent.type === "ArrowFunctionExpression") {
-    this.tokenContext |= _index.TokenContext.arrowFlowReturnType;
-  } else if (node.optional) {
-    this.tokenChar(63);
+});
+defineType("ObjectTypeCallProperty", {
+  visitor: ["value"],
+  aliases: ["UserWhitespacable"],
+  fields: {
+    value: (0, _utils.validateType)("FlowType"),
+    static: (0, _utils.validate)((0, _utils.assertValueType)("boolean"))
   }
-  this.print(node.typeAnnotation);
-}
-function TypeParameterInstantiation(node) {
-  this.tokenChar(60);
-  this.printList(node.params);
-  this.tokenChar(62);
-}
-function TypeParameter(node) {
-  this._variance(node);
-  this.word(node.name);
-  if (node.bound) {
-    this.print(node.bound);
+});
+defineType("ObjectTypeIndexer", {
+  visitor: ["variance", "id", "key", "value"],
+  builder: ["id", "key", "value", "variance"],
+  aliases: ["UserWhitespacable"],
+  fields: {
+    id: (0, _utils.validateOptionalType)("Identifier"),
+    key: (0, _utils.validateType)("FlowType"),
+    value: (0, _utils.validateType)("FlowType"),
+    static: (0, _utils.validate)((0, _utils.assertValueType)("boolean")),
+    variance: (0, _utils.validateOptionalType)("Variance")
   }
-  if (node.default) {
-    this.space();
-    this.tokenChar(61);
-    this.space();
-    this.print(node.default);
+});
+defineType("ObjectTypeProperty", {
+  visitor: ["key", "value", "variance"],
+  aliases: ["UserWhitespacable"],
+  fields: {
+    key: (0, _utils.validateType)("Identifier", "StringLiteral"),
+    value: (0, _utils.validateType)("FlowType"),
+    kind: (0, _utils.validate)((0, _utils.assertOneOf)("init", "get", "set")),
+    static: (0, _utils.validate)((0, _utils.assertValueType)("boolean")),
+    proto: (0, _utils.validate)((0, _utils.assertValueType)("boolean")),
+    optional: (0, _utils.validate)((0, _utils.assertValueType)("boolean")),
+    variance: (0, _utils.validateOptionalType)("Variance"),
+    method: (0, _utils.validate)((0, _utils.assertValueType)("boolean"))
   }
-}
-function OpaqueType(node) {
-  this.word("opaque");
-  this.space();
-  this.word("type");
-  this.space();
-  this.print(node.id);
-  this.print(node.typeParameters);
-  if (node.supertype) {
-    this.tokenChar(58);
-    this.space();
-    this.print(node.supertype);
+});
+defineType("ObjectTypeSpreadProperty", {
+  visitor: ["argument"],
+  aliases: ["UserWhitespacable"],
+  fields: {
+    argument: (0, _utils.validateType)("FlowType")
   }
-  if (node.impltype) {
-    this.space();
-    this.tokenChar(61);
-    this.space();
-    this.print(node.impltype);
+});
+defineType("OpaqueType", {
+  visitor: ["id", "typeParameters", "supertype", "impltype"],
+  aliases: ["FlowDeclaration", "Statement", "Declaration"],
+  fields: {
+    id: (0, _utils.validateType)("Identifier"),
+    typeParameters: (0, _utils.validateOptionalType)("TypeParameterDeclaration"),
+    supertype: (0, _utils.validateOptionalType)("FlowType"),
+    impltype: (0, _utils.validateType)("FlowType")
   }
-  this.semicolon();
-}
-function ObjectTypeAnnotation(node) {
-  if (node.exact) {
-    this.token("{|");
-  } else {
-    this.tokenChar(123);
+});
+defineType("QualifiedTypeIdentifier", {
+  visitor: ["qualification", "id"],
+  builder: ["id", "qualification"],
+  fields: {
+    id: (0, _utils.validateType)("Identifier"),
+    qualification: (0, _utils.validateType)("Identifier", "QualifiedTypeIdentifier")
   }
-  const props = [...node.properties, ...(node.callProperties || []), ...(node.indexers || []), ...(node.internalSlots || [])];
-  if (props.length) {
-    this.newline();
-    this.space();
-    this.printJoin(props, true, true, undefined, undefined, () => {
-      if (props.length !== 1 || node.inexact) {
-        this.tokenChar(44);
-        this.space();
-      }
-    });
-    this.space();
+});
+defineType("StringLiteralTypeAnnotation", {
+  builder: ["value"],
+  aliases: ["FlowType"],
+  fields: {
+    value: (0, _utils.validate)((0, _utils.assertValueType)("string"))
   }
-  if (node.inexact) {
-    this.indent();
-    this.token("...");
-    if (props.length) {
-      this.newline();
-    }
-    this.dedent();
+});
+defineType("StringTypeAnnotation", {
+  aliases: ["FlowType", "FlowBaseAnnotation"]
+});
+defineType("SymbolTypeAnnotation", {
+  aliases: ["FlowType", "FlowBaseAnnotation"]
+});
+defineType("ThisTypeAnnotation", {
+  aliases: ["FlowType", "FlowBaseAnnotation"]
+});
+defineType("TupleTypeAnnotation", {
+  visitor: ["types"],
+  aliases: ["FlowType"],
+  fields: {
+    types: (0, _utils.validate)((0, _utils.arrayOfType)("FlowType"))
   }
-  if (node.exact) {
-    this.token("|}");
-  } else {
-    this.tokenChar(125);
+});
+defineType("TypeofTypeAnnotation", {
+  visitor: ["argument"],
+  aliases: ["FlowType"],
+  fields: {
+    argument: (0, _utils.validateType)("FlowType")
   }
-}
-function ObjectTypeInternalSlot(node) {
-  if (node.static) {
-    this.word("static");
-    this.space();
+});
+defineType("TypeAlias", {
+  visitor: ["id", "typeParameters", "right"],
+  aliases: ["FlowDeclaration", "Statement", "Declaration"],
+  fields: {
+    id: (0, _utils.validateType)("Identifier"),
+    typeParameters: (0, _utils.validateOptionalType)("TypeParameterDeclaration"),
+    right: (0, _utils.validateType)("FlowType")
   }
-  this.tokenChar(91);
-  this.tokenChar(91);
-  this.print(node.id);
-  this.tokenChar(93);
-  this.tokenChar(93);
-  if (node.optional) this.tokenChar(63);
-  if (!node.method) {
-    this.tokenChar(58);
-    this.space();
+});
+defineType("TypeAnnotation", {
+  visitor: ["typeAnnotation"],
+  fields: {
+    typeAnnotation: (0, _utils.validateType)("FlowType")
   }
-  this.print(node.value);
-}
-function ObjectTypeCallProperty(node) {
-  if (node.static) {
-    this.word("static");
-    this.space();
+});
+defineType("TypeCastExpression", {
+  visitor: ["expression", "typeAnnotation"],
+  aliases: ["ExpressionWrapper", "Expression"],
+  fields: {
+    expression: (0, _utils.validateType)("Expression"),
+    typeAnnotation: (0, _utils.validateType)("TypeAnnotation")
   }
-  this.print(node.value);
-}
-function ObjectTypeIndexer(node) {
-  if (node.static) {
-    this.word("static");
-    this.space();
+});
+defineType("TypeParameter", {
+  visitor: ["bound", "default", "variance"],
+  fields: {
+    name: (0, _utils.validate)((0, _utils.assertValueType)("string")),
+    bound: (0, _utils.validateOptionalType)("TypeAnnotation"),
+    default: (0, _utils.validateOptionalType)("FlowType"),
+    variance: (0, _utils.validateOptionalType)("Variance")
   }
-  this._variance(node);
-  this.tokenChar(91);
-  if (node.id) {
-    this.print(node.id);
-    this.tokenChar(58);
-    this.space();
+});
+defineType("TypeParameterDeclaration", {
+  visitor: ["params"],
+  fields: {
+    params: (0, _utils.validate)((0, _utils.arrayOfType)("TypeParameter"))
   }
-  this.print(node.key);
-  this.tokenChar(93);
-  this.tokenChar(58);
-  this.space();
-  this.print(node.value);
-}
-function ObjectTypeProperty(node) {
-  if (node.proto) {
-    this.word("proto");
-    this.space();
+});
+defineType("TypeParameterInstantiation", {
+  visitor: ["params"],
+  fields: {
+    params: (0, _utils.validate)((0, _utils.arrayOfType)("FlowType"))
   }
-  if (node.static) {
-    this.word("static");
-    this.space();
+});
+defineType("UnionTypeAnnotation", {
+  visitor: ["types"],
+  aliases: ["FlowType"],
+  fields: {
+    types: (0, _utils.validate)((0, _utils.arrayOfType)("FlowType"))
   }
-  if (node.kind === "get" || node.kind === "set") {
-    this.word(node.kind);
-    this.space();
+});
+defineType("Variance", {
+  builder: ["kind"],
+  fields: {
+    kind: (0, _utils.validate)((0, _utils.assertOneOf)("minus", "plus"))
   }
-  this._variance(node);
-  this.print(node.key);
-  if (node.optional) this.tokenChar(63);
-  if (!node.method) {
-    this.tokenChar(58);
-    this.space();
+});
+defineType("VoidTypeAnnotation", {
+  aliases: ["FlowType", "FlowBaseAnnotation"]
+});
+defineType("EnumDeclaration", {
+  aliases: ["Statement", "Declaration"],
+  visitor: ["id", "body"],
+  fields: {
+    id: (0, _utils.validateType)("Identifier"),
+    body: (0, _utils.validateType)("EnumBooleanBody", "EnumNumberBody", "EnumStringBody", "EnumSymbolBody")
   }
-  this.print(node.value);
-}
-function ObjectTypeSpreadProperty(node) {
-  this.token("...");
-  this.print(node.argument);
-}
-function QualifiedTypeIdentifier(node) {
-  this.print(node.qualification);
-  this.tokenChar(46);
-  this.print(node.id);
-}
-function SymbolTypeAnnotation() {
-  this.word("symbol");
-}
-function orSeparator(occurrenceCount) {
-  this.space();
-  this.token("|", false, occurrenceCount);
-  this.space();
-}
-function UnionTypeAnnotation(node) {
-  this.printJoin(node.types, undefined, undefined, orSeparator);
-}
-function TypeCastExpression(node) {
-  this.tokenChar(40);
-  this.print(node.expression);
-  this.print(node.typeAnnotation);
-  this.tokenChar(41);
-}
-function Variance(node) {
-  if (node.kind === "plus") {
-    this.tokenChar(43);
-  } else {
-    this.tokenChar(45);
+});
+defineType("EnumBooleanBody", {
+  aliases: ["EnumBody"],
+  visitor: ["members"],
+  fields: {
+    explicitType: (0, _utils.validate)((0, _utils.assertValueType)("boolean")),
+    members: (0, _utils.validateArrayOfType)("EnumBooleanMember"),
+    hasUnknownMembers: (0, _utils.validate)((0, _utils.assertValueType)("boolean"))
   }
-}
-function VoidTypeAnnotation() {
-  this.word("void");
-}
-function IndexedAccessType(node) {
-  this.print(node.objectType, true);
-  this.tokenChar(91);
-  this.print(node.indexType);
-  this.tokenChar(93);
-}
-function OptionalIndexedAccessType(node) {
-  this.print(node.objectType);
-  if (node.optional) {
-    this.token("?.");
+});
+defineType("EnumNumberBody", {
+  aliases: ["EnumBody"],
+  visitor: ["members"],
+  fields: {
+    explicitType: (0, _utils.validate)((0, _utils.assertValueType)("boolean")),
+    members: (0, _utils.validateArrayOfType)("EnumNumberMember"),
+    hasUnknownMembers: (0, _utils.validate)((0, _utils.assertValueType)("boolean"))
   }
-  this.tokenChar(91);
-  this.print(node.indexType);
-  this.tokenChar(93);
-}
+});
+defineType("EnumStringBody", {
+  aliases: ["EnumBody"],
+  visitor: ["members"],
+  fields: {
+    explicitType: (0, _utils.validate)((0, _utils.assertValueType)("boolean")),
+    members: (0, _utils.validateArrayOfType)("EnumStringMember", "EnumDefaultedMember"),
+    hasUnknownMembers: (0, _utils.validate)((0, _utils.assertValueType)("boolean"))
+  }
+});
+defineType("EnumSymbolBody", {
+  aliases: ["EnumBody"],
+  visitor: ["members"],
+  fields: {
+    members: (0, _utils.validateArrayOfType)("EnumDefaultedMember"),
+    hasUnknownMembers: (0, _utils.validate)((0, _utils.assertValueType)("boolean"))
+  }
+});
+defineType("EnumBooleanMember", {
+  aliases: ["EnumMember"],
+  builder: ["id"],
+  visitor: ["id", "init"],
+  fields: {
+    id: (0, _utils.validateType)("Identifier"),
+    init: (0, _utils.validateType)("BooleanLiteral")
+  }
+});
+defineType("EnumNumberMember", {
+  aliases: ["EnumMember"],
+  visitor: ["id", "init"],
+  fields: {
+    id: (0, _utils.validateType)("Identifier"),
+    init: (0, _utils.validateType)("NumericLiteral")
+  }
+});
+defineType("EnumStringMember", {
+  aliases: ["EnumMember"],
+  visitor: ["id", "init"],
+  fields: {
+    id: (0, _utils.validateType)("Identifier"),
+    init: (0, _utils.validateType)("StringLiteral")
+  }
+});
+defineType("EnumDefaultedMember", {
+  aliases: ["EnumMember"],
+  visitor: ["id"],
+  fields: {
+    id: (0, _utils.validateType)("Identifier")
+  }
+});
+defineType("IndexedAccessType", {
+  visitor: ["objectType", "indexType"],
+  aliases: ["FlowType"],
+  fields: {
+    objectType: (0, _utils.validateType)("FlowType"),
+    indexType: (0, _utils.validateType)("FlowType")
+  }
+});
+defineType("OptionalIndexedAccessType", {
+  visitor: ["objectType", "indexType"],
+  aliases: ["FlowType"],
+  fields: {
+    objectType: (0, _utils.validateType)("FlowType"),
+    indexType: (0, _utils.validateType)("FlowType"),
+    optional: (0, _utils.validate)((0, _utils.assertValueType)("boolean"))
+  }
+});
 
 //# sourceMappingURL=flow.js.map

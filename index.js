@@ -3,85 +3,104 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-Object.defineProperty(exports, "Hub", {
+Object.defineProperty(exports, "ALIAS_KEYS", {
   enumerable: true,
   get: function () {
-    return _hub.default;
+    return _utils.ALIAS_KEYS;
   }
 });
-Object.defineProperty(exports, "NodePath", {
+Object.defineProperty(exports, "BUILDER_KEYS", {
   enumerable: true,
   get: function () {
-    return _index.default;
+    return _utils.BUILDER_KEYS;
   }
 });
-Object.defineProperty(exports, "Scope", {
+Object.defineProperty(exports, "DEPRECATED_ALIASES", {
   enumerable: true,
   get: function () {
-    return _index2.default;
+    return _deprecatedAliases.DEPRECATED_ALIASES;
   }
 });
-exports.visitors = exports.default = void 0;
-require("./path/context.js");
-var visitors = require("./visitors.js");
-exports.visitors = visitors;
-var _t = require("@babel/types");
-var cache = require("./cache.js");
-var _traverseNode = require("./traverse-node.js");
-var _index = require("./path/index.js");
-var _index2 = require("./scope/index.js");
-var _hub = require("./hub.js");
-const {
-  VISITOR_KEYS,
-  removeProperties,
-  traverseFast
-} = _t;
-function traverse(parent, opts = {}, scope, state, parentPath, visitSelf) {
-  if (!parent) return;
-  if (!opts.noScope && !scope) {
-    if (parent.type !== "Program" && parent.type !== "File") {
-      throw new Error("You must pass a scope and parentPath unless traversing a Program/File. " + `Instead of that you tried to traverse a ${parent.type} node without ` + "passing scope and parentPath.");
+Object.defineProperty(exports, "DEPRECATED_KEYS", {
+  enumerable: true,
+  get: function () {
+    return _utils.DEPRECATED_KEYS;
+  }
+});
+Object.defineProperty(exports, "FLIPPED_ALIAS_KEYS", {
+  enumerable: true,
+  get: function () {
+    return _utils.FLIPPED_ALIAS_KEYS;
+  }
+});
+Object.defineProperty(exports, "NODE_FIELDS", {
+  enumerable: true,
+  get: function () {
+    return _utils.NODE_FIELDS;
+  }
+});
+Object.defineProperty(exports, "NODE_PARENT_VALIDATIONS", {
+  enumerable: true,
+  get: function () {
+    return _utils.NODE_PARENT_VALIDATIONS;
+  }
+});
+Object.defineProperty(exports, "NODE_UNION_SHAPES__PRIVATE", {
+  enumerable: true,
+  get: function () {
+    return _utils.NODE_UNION_SHAPES__PRIVATE;
+  }
+});
+Object.defineProperty(exports, "PLACEHOLDERS", {
+  enumerable: true,
+  get: function () {
+    return _placeholders.PLACEHOLDERS;
+  }
+});
+Object.defineProperty(exports, "PLACEHOLDERS_ALIAS", {
+  enumerable: true,
+  get: function () {
+    return _placeholders.PLACEHOLDERS_ALIAS;
+  }
+});
+Object.defineProperty(exports, "PLACEHOLDERS_FLIPPED_ALIAS", {
+  enumerable: true,
+  get: function () {
+    return _placeholders.PLACEHOLDERS_FLIPPED_ALIAS;
+  }
+});
+exports.TYPES = void 0;
+Object.defineProperty(exports, "VISITOR_KEYS", {
+  enumerable: true,
+  get: function () {
+    return _utils.VISITOR_KEYS;
+  }
+});
+require("./core.js");
+require("./flow.js");
+require("./jsx.js");
+require("./misc.js");
+require("./experimental.js");
+require("./typescript.js");
+var _utils = require("./utils.js");
+var _placeholders = require("./placeholders.js");
+var _deprecatedAliases = require("./deprecated-aliases.js");
+Object.keys(_deprecatedAliases.DEPRECATED_ALIASES).forEach(deprecatedAlias => {
+  _utils.FLIPPED_ALIAS_KEYS[deprecatedAlias] = _utils.FLIPPED_ALIAS_KEYS[_deprecatedAliases.DEPRECATED_ALIASES[deprecatedAlias]];
+});
+for (const {
+  types,
+  set
+} of _utils.allExpandedTypes) {
+  for (const type of types) {
+    const aliases = _utils.FLIPPED_ALIAS_KEYS[type];
+    if (aliases) {
+      aliases.forEach(set.add, set);
+    } else {
+      set.add(type);
     }
   }
-  if (!parentPath && visitSelf) {
-    throw new Error("visitSelf can only be used when providing a NodePath.");
-  }
-  if (!VISITOR_KEYS[parent.type]) {
-    return;
-  }
-  visitors.explode(opts);
-  (0, _traverseNode.traverseNode)(parent, opts, scope, state, parentPath, undefined, visitSelf);
 }
-var _default = exports.default = traverse;
-traverse.visitors = visitors;
-traverse.verify = visitors.verify;
-traverse.explode = visitors.explode;
-traverse.cheap = function (node, enter) {
-  traverseFast(node, enter);
-  return;
-};
-traverse.node = function (node, opts, scope, state, path, skipKeys) {
-  (0, _traverseNode.traverseNode)(node, opts, scope, state, path, skipKeys);
-};
-traverse.clearNode = function (node, opts) {
-  removeProperties(node, opts);
-};
-traverse.removeProperties = function (tree, opts) {
-  traverseFast(tree, traverse.clearNode, opts);
-  return tree;
-};
-traverse.hasType = function (tree, type, denylistTypes) {
-  if (denylistTypes != null && denylistTypes.includes(tree.type)) return false;
-  if (tree.type === type) return true;
-  return traverseFast(tree, function (node) {
-    if (denylistTypes != null && denylistTypes.includes(node.type)) {
-      return traverseFast.skip;
-    }
-    if (node.type === type) {
-      return traverseFast.stop;
-    }
-  });
-};
-traverse.cache = cache;
+const TYPES = exports.TYPES = [].concat(Object.keys(_utils.VISITOR_KEYS), Object.keys(_utils.FLIPPED_ALIAS_KEYS), Object.keys(_utils.DEPRECATED_KEYS));
 
 //# sourceMappingURL=index.js.map

@@ -1,725 +1,529 @@
 "use strict";
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
+var _utils = require("./utils.js");
+var _core = require("./core.js");
+var _is = require("../validators/is.js");
+const defineType = (0, _utils.defineAliasedType)("TypeScript");
+const bool = (0, _utils.assertValueType)("boolean");
+const tSFunctionTypeAnnotationCommon = () => ({
+  returnType: {
+    validate: (0, _utils.assertNodeType)("TSTypeAnnotation", "Noop"),
+    optional: true
+  },
+  typeParameters: {
+    validate: (0, _utils.assertNodeType)("TSTypeParameterDeclaration", "Noop"),
+    optional: true
+  }
 });
-exports.TSAnyKeyword = TSAnyKeyword;
-exports.TSArrayType = TSArrayType;
-exports.TSSatisfiesExpression = exports.TSAsExpression = TSTypeExpression;
-exports.TSBigIntKeyword = TSBigIntKeyword;
-exports.TSBooleanKeyword = TSBooleanKeyword;
-exports.TSCallSignatureDeclaration = TSCallSignatureDeclaration;
-exports.TSInterfaceHeritage = exports.TSClassImplements = TSClassImplements;
-exports.TSConditionalType = TSConditionalType;
-exports.TSConstructSignatureDeclaration = TSConstructSignatureDeclaration;
-exports.TSConstructorType = TSConstructorType;
-exports.TSDeclareFunction = TSDeclareFunction;
-exports.TSDeclareMethod = TSDeclareMethod;
-exports.TSEnumBody = TSEnumBody;
-exports.TSEnumDeclaration = TSEnumDeclaration;
-exports.TSEnumMember = TSEnumMember;
-exports.TSExportAssignment = TSExportAssignment;
-exports.TSExternalModuleReference = TSExternalModuleReference;
-exports.TSFunctionType = TSFunctionType;
-exports.TSImportEqualsDeclaration = TSImportEqualsDeclaration;
-exports.TSImportType = TSImportType;
-exports.TSIndexSignature = TSIndexSignature;
-exports.TSIndexedAccessType = TSIndexedAccessType;
-exports.TSInferType = TSInferType;
-exports.TSInstantiationExpression = TSInstantiationExpression;
-exports.TSInterfaceBody = TSInterfaceBody;
-exports.TSInterfaceDeclaration = TSInterfaceDeclaration;
-exports.TSIntersectionType = TSIntersectionType;
-exports.TSIntrinsicKeyword = TSIntrinsicKeyword;
-exports.TSLiteralType = TSLiteralType;
-exports.TSMappedType = TSMappedType;
-exports.TSMethodSignature = TSMethodSignature;
-exports.TSModuleBlock = TSModuleBlock;
-exports.TSModuleDeclaration = TSModuleDeclaration;
-exports.TSNamedTupleMember = TSNamedTupleMember;
-exports.TSNamespaceExportDeclaration = TSNamespaceExportDeclaration;
-exports.TSNeverKeyword = TSNeverKeyword;
-exports.TSNonNullExpression = TSNonNullExpression;
-exports.TSNullKeyword = TSNullKeyword;
-exports.TSNumberKeyword = TSNumberKeyword;
-exports.TSObjectKeyword = TSObjectKeyword;
-exports.TSOptionalType = TSOptionalType;
-exports.TSParameterProperty = TSParameterProperty;
-exports.TSParenthesizedType = TSParenthesizedType;
-exports.TSPropertySignature = TSPropertySignature;
-exports.TSQualifiedName = TSQualifiedName;
-exports.TSRestType = TSRestType;
-exports.TSStringKeyword = TSStringKeyword;
-exports.TSSymbolKeyword = TSSymbolKeyword;
-exports.TSTemplateLiteralType = TSTemplateLiteralType;
-exports.TSThisType = TSThisType;
-exports.TSTupleType = TSTupleType;
-exports.TSTypeAliasDeclaration = TSTypeAliasDeclaration;
-exports.TSTypeAnnotation = TSTypeAnnotation;
-exports.TSTypeAssertion = TSTypeAssertion;
-exports.TSTypeLiteral = TSTypeLiteral;
-exports.TSTypeOperator = TSTypeOperator;
-exports.TSTypeParameter = TSTypeParameter;
-exports.TSTypeParameterDeclaration = exports.TSTypeParameterInstantiation = TSTypeParameterInstantiation;
-exports.TSTypePredicate = TSTypePredicate;
-exports.TSTypeQuery = TSTypeQuery;
-exports.TSTypeReference = TSTypeReference;
-exports.TSUndefinedKeyword = TSUndefinedKeyword;
-exports.TSUnionType = TSUnionType;
-exports.TSUnknownKeyword = TSUnknownKeyword;
-exports.TSVoidKeyword = TSVoidKeyword;
-exports.tsPrintClassMemberModifiers = tsPrintClassMemberModifiers;
-exports.tsPrintFunctionOrConstructorType = tsPrintFunctionOrConstructorType;
-exports.tsPrintPropertyOrMethodName = tsPrintPropertyOrMethodName;
-exports.tsPrintSignatureDeclarationBase = tsPrintSignatureDeclarationBase;
-function TSTypeAnnotation(node, parent) {
-  this.token((parent.type === "TSFunctionType" || parent.type === "TSConstructorType") && parent.typeAnnotation === node ? "=>" : ":");
-  this.space();
-  if (node.optional) this.tokenChar(63);
-  this.print(node.typeAnnotation);
-}
-function TSTypeParameterInstantiation(node, parent) {
-  this.tokenChar(60);
-  let printTrailingSeparator = parent.type === "ArrowFunctionExpression" && node.params.length === 1;
-  if (this.tokenMap && node.start != null && node.end != null) {
-    printTrailingSeparator && (printTrailingSeparator = !!this.tokenMap.find(node, t => this.tokenMap.matchesOriginal(t, ",")));
-    printTrailingSeparator || (printTrailingSeparator = this.shouldPrintTrailingComma(">"));
+defineType("TSParameterProperty", {
+  aliases: ["LVal"],
+  visitor: ["parameter"],
+  fields: {
+    accessibility: {
+      validate: (0, _utils.assertOneOf)("public", "private", "protected"),
+      optional: true
+    },
+    readonly: {
+      validate: (0, _utils.assertValueType)("boolean"),
+      optional: true
+    },
+    parameter: {
+      validate: (0, _utils.assertNodeType)("Identifier", "AssignmentPattern")
+    },
+    override: {
+      validate: (0, _utils.assertValueType)("boolean"),
+      optional: true
+    },
+    decorators: {
+      validate: (0, _utils.arrayOfType)("Decorator"),
+      optional: true
+    }
   }
-  this.printList(node.params, printTrailingSeparator);
-  this.tokenChar(62);
-}
-function TSTypeParameter(node) {
-  if (node.const) {
-    this.word("const");
-    this.space();
+});
+defineType("TSDeclareFunction", {
+  aliases: ["Statement", "Declaration"],
+  visitor: ["id", "typeParameters", "params", "returnType"],
+  fields: Object.assign({}, (0, _core.functionDeclarationCommon)(), tSFunctionTypeAnnotationCommon())
+});
+defineType("TSDeclareMethod", Object.assign({
+  visitor: ["decorators", "key", "typeParameters", "params", "returnType"]
+}, (0, _core.classMethodOrPropertyUnionShapeCommon)(), {
+  fields: Object.assign({}, (0, _core.classMethodOrDeclareMethodCommon)(), tSFunctionTypeAnnotationCommon())
+}));
+defineType("TSQualifiedName", {
+  aliases: ["TSEntityName"],
+  visitor: ["left", "right"],
+  fields: {
+    left: (0, _utils.validateType)("TSEntityName"),
+    right: (0, _utils.validateType)("Identifier")
   }
-  if (node.in) {
-    this.word("in");
-    this.space();
+});
+const signatureDeclarationCommon = () => ({
+  typeParameters: (0, _utils.validateOptionalType)("TSTypeParameterDeclaration"),
+  ["parameters"]: (0, _utils.validateArrayOfType)("ArrayPattern", "Identifier", "ObjectPattern", "RestElement"),
+  ["typeAnnotation"]: (0, _utils.validateOptionalType)("TSTypeAnnotation")
+});
+const callConstructSignatureDeclaration = {
+  aliases: ["TSTypeElement"],
+  visitor: ["typeParameters", "parameters", "typeAnnotation"],
+  fields: signatureDeclarationCommon()
+};
+defineType("TSCallSignatureDeclaration", callConstructSignatureDeclaration);
+defineType("TSConstructSignatureDeclaration", callConstructSignatureDeclaration);
+const namedTypeElementCommon = () => ({
+  key: (0, _utils.validateType)("Expression"),
+  computed: {
+    default: false
+  },
+  optional: (0, _utils.validateOptional)(bool)
+});
+defineType("TSPropertySignature", {
+  aliases: ["TSTypeElement"],
+  visitor: ["key", "typeAnnotation"],
+  fields: Object.assign({}, namedTypeElementCommon(), {
+    readonly: (0, _utils.validateOptional)(bool),
+    typeAnnotation: (0, _utils.validateOptionalType)("TSTypeAnnotation"),
+    kind: {
+      optional: true,
+      validate: (0, _utils.assertOneOf)("get", "set")
+    }
+  })
+});
+defineType("TSMethodSignature", {
+  aliases: ["TSTypeElement"],
+  visitor: ["key", "typeParameters", "parameters", "typeAnnotation"],
+  fields: Object.assign({}, signatureDeclarationCommon(), namedTypeElementCommon(), {
+    kind: {
+      validate: (0, _utils.assertOneOf)("method", "get", "set")
+    }
+  })
+});
+defineType("TSIndexSignature", {
+  aliases: ["TSTypeElement"],
+  visitor: ["parameters", "typeAnnotation"],
+  fields: {
+    readonly: (0, _utils.validateOptional)(bool),
+    static: (0, _utils.validateOptional)(bool),
+    parameters: (0, _utils.validateArrayOfType)("Identifier"),
+    typeAnnotation: (0, _utils.validateOptionalType)("TSTypeAnnotation")
   }
-  if (node.out) {
-    this.word("out");
-    this.space();
-  }
-  this.word(node.name);
-  if (node.constraint) {
-    this.space();
-    this.word("extends");
-    this.space();
-    this.print(node.constraint);
-  }
-  if (node.default) {
-    this.space();
-    this.tokenChar(61);
-    this.space();
-    this.print(node.default);
-  }
-}
-function TSParameterProperty(node) {
-  if (node.accessibility) {
-    this.word(node.accessibility);
-    this.space();
-  }
-  if (node.readonly) {
-    this.word("readonly");
-    this.space();
-  }
-  this._param(node.parameter);
-}
-function TSDeclareFunction(node, parent) {
-  if (node.declare) {
-    this.word("declare");
-    this.space();
-  }
-  this._functionHead(node, parent);
-  this.semicolon();
-}
-function TSDeclareMethod(node) {
-  this._classMethodHead(node);
-  this.semicolon();
-}
-function TSQualifiedName(node) {
-  this.print(node.left);
-  this.tokenChar(46);
-  this.print(node.right);
-}
-function TSCallSignatureDeclaration(node) {
-  this.tsPrintSignatureDeclarationBase(node);
-  maybePrintTrailingCommaOrSemicolon(this, node);
-}
-function maybePrintTrailingCommaOrSemicolon(printer, node) {
-  if (!printer.tokenMap || !node.start || !node.end) {
-    printer.semicolon();
-    return;
-  }
-  if (printer.tokenMap.endMatches(node, ",")) {
-    printer.token(",");
-  } else if (printer.tokenMap.endMatches(node, ";")) {
-    printer.semicolon();
-  }
-}
-function TSConstructSignatureDeclaration(node) {
-  this.word("new");
-  this.space();
-  this.tsPrintSignatureDeclarationBase(node);
-  maybePrintTrailingCommaOrSemicolon(this, node);
-}
-function TSPropertySignature(node) {
-  const {
-    readonly
-  } = node;
-  if (readonly) {
-    this.word("readonly");
-    this.space();
-  }
-  this.tsPrintPropertyOrMethodName(node);
-  this.print(node.typeAnnotation);
-  maybePrintTrailingCommaOrSemicolon(this, node);
-}
-function tsPrintPropertyOrMethodName(node) {
-  if (node.computed) {
-    this.tokenChar(91);
-  }
-  this.print(node.key);
-  if (node.computed) {
-    this.tokenChar(93);
-  }
-  if (node.optional) {
-    this.tokenChar(63);
-  }
-}
-function TSMethodSignature(node) {
-  const {
-    kind
-  } = node;
-  if (kind === "set" || kind === "get") {
-    this.word(kind);
-    this.space();
-  }
-  this.tsPrintPropertyOrMethodName(node);
-  this.tsPrintSignatureDeclarationBase(node);
-  maybePrintTrailingCommaOrSemicolon(this, node);
-}
-function TSIndexSignature(node) {
-  const {
-    readonly,
-    static: isStatic
-  } = node;
-  if (isStatic) {
-    this.word("static");
-    this.space();
-  }
-  if (readonly) {
-    this.word("readonly");
-    this.space();
-  }
-  this.tokenChar(91);
-  this._parameters(node.parameters, "]");
-  this.print(node.typeAnnotation);
-  maybePrintTrailingCommaOrSemicolon(this, node);
-}
-function TSAnyKeyword() {
-  this.word("any");
-}
-function TSBigIntKeyword() {
-  this.word("bigint");
-}
-function TSUnknownKeyword() {
-  this.word("unknown");
-}
-function TSNumberKeyword() {
-  this.word("number");
-}
-function TSObjectKeyword() {
-  this.word("object");
-}
-function TSBooleanKeyword() {
-  this.word("boolean");
-}
-function TSStringKeyword() {
-  this.word("string");
-}
-function TSSymbolKeyword() {
-  this.word("symbol");
-}
-function TSVoidKeyword() {
-  this.word("void");
-}
-function TSUndefinedKeyword() {
-  this.word("undefined");
-}
-function TSNullKeyword() {
-  this.word("null");
-}
-function TSNeverKeyword() {
-  this.word("never");
-}
-function TSIntrinsicKeyword() {
-  this.word("intrinsic");
-}
-function TSThisType() {
-  this.word("this");
-}
-function TSFunctionType(node) {
-  this.tsPrintFunctionOrConstructorType(node);
-}
-function TSConstructorType(node) {
-  if (node.abstract) {
-    this.word("abstract");
-    this.space();
-  }
-  this.word("new");
-  this.space();
-  this.tsPrintFunctionOrConstructorType(node);
-}
-function tsPrintFunctionOrConstructorType(node) {
-  const {
-    typeParameters
-  } = node;
-  const parameters = node.parameters;
-  this.print(typeParameters);
-  this.tokenChar(40);
-  this._parameters(parameters, ")");
-  this.space();
-  const returnType = node.typeAnnotation;
-  this.print(returnType);
-}
-function TSTypeReference(node) {
-  const typeArguments = node.typeParameters;
-  this.print(node.typeName, !!typeArguments);
-  this.print(typeArguments);
-}
-function TSTypePredicate(node) {
-  if (node.asserts) {
-    this.word("asserts");
-    this.space();
-  }
-  this.print(node.parameterName);
-  if (node.typeAnnotation) {
-    this.space();
-    this.word("is");
-    this.space();
-    this.print(node.typeAnnotation.typeAnnotation);
-  }
-}
-function TSTypeQuery(node) {
-  this.word("typeof");
-  this.space();
-  this.print(node.exprName);
-  const typeArguments = node.typeParameters;
-  if (typeArguments) {
-    this.print(typeArguments);
-  }
-}
-function TSTypeLiteral(node) {
-  printBraced(this, node, () => this.printJoin(node.members, true, true));
-}
-function TSArrayType(node) {
-  this.print(node.elementType, true);
-  this.tokenChar(91);
-  this.tokenChar(93);
-}
-function TSTupleType(node) {
-  this.tokenChar(91);
-  this.printList(node.elementTypes, this.shouldPrintTrailingComma("]"));
-  this.tokenChar(93);
-}
-function TSOptionalType(node) {
-  this.print(node.typeAnnotation);
-  this.tokenChar(63);
-}
-function TSRestType(node) {
-  this.token("...");
-  this.print(node.typeAnnotation);
-}
-function TSNamedTupleMember(node) {
-  this.print(node.label);
-  if (node.optional) this.tokenChar(63);
-  this.tokenChar(58);
-  this.space();
-  this.print(node.elementType);
-}
-function TSUnionType(node) {
-  tsPrintUnionOrIntersectionType(this, node, "|");
-}
-function TSIntersectionType(node) {
-  tsPrintUnionOrIntersectionType(this, node, "&");
-}
-function tsPrintUnionOrIntersectionType(printer, node, sep) {
-  var _printer$tokenMap;
-  let hasLeadingToken = 0;
-  if ((_printer$tokenMap = printer.tokenMap) != null && _printer$tokenMap.startMatches(node, sep)) {
-    hasLeadingToken = 1;
-    printer.token(sep);
-  }
-  printer.printJoin(node.types, undefined, undefined, function (i) {
-    this.space();
-    this.token(sep, undefined, i + hasLeadingToken);
-    this.space();
+});
+const tsKeywordTypes = ["TSAnyKeyword", "TSBooleanKeyword", "TSBigIntKeyword", "TSIntrinsicKeyword", "TSNeverKeyword", "TSNullKeyword", "TSNumberKeyword", "TSObjectKeyword", "TSStringKeyword", "TSSymbolKeyword", "TSUndefinedKeyword", "TSUnknownKeyword", "TSVoidKeyword"];
+for (const type of tsKeywordTypes) {
+  defineType(type, {
+    aliases: ["TSType", "TSBaseType"],
+    visitor: [],
+    fields: {}
   });
 }
-function TSConditionalType(node) {
-  this.print(node.checkType);
-  this.space();
-  this.word("extends");
-  this.space();
-  this.print(node.extendsType);
-  this.space();
-  this.tokenChar(63);
-  this.space();
-  this.print(node.trueType);
-  this.space();
-  this.tokenChar(58);
-  this.space();
-  this.print(node.falseType);
-}
-function TSInferType(node) {
-  this.word("infer");
-  this.print(node.typeParameter);
-}
-function TSParenthesizedType(node) {
-  this.tokenChar(40);
-  this.print(node.typeAnnotation);
-  this.tokenChar(41);
-}
-function TSTypeOperator(node) {
-  this.word(node.operator);
-  this.space();
-  this.print(node.typeAnnotation);
-}
-function TSIndexedAccessType(node) {
-  this.print(node.objectType, true);
-  this.tokenChar(91);
-  this.print(node.indexType);
-  this.tokenChar(93);
-}
-function TSMappedType(node) {
-  const {
-    nameType,
-    optional,
-    readonly,
-    typeAnnotation
-  } = node;
-  this.tokenChar(123);
-  const exit = this.enterDelimited();
-  this.space();
-  if (readonly) {
-    tokenIfPlusMinus(this, readonly);
-    this.word("readonly");
-    this.space();
+defineType("TSThisType", {
+  aliases: ["TSType", "TSBaseType"],
+  visitor: [],
+  fields: {}
+});
+const fnOrCtrBase = {
+  aliases: ["TSType"],
+  visitor: ["typeParameters", "parameters", "typeAnnotation"]
+};
+defineType("TSFunctionType", Object.assign({}, fnOrCtrBase, {
+  fields: signatureDeclarationCommon()
+}));
+defineType("TSConstructorType", Object.assign({}, fnOrCtrBase, {
+  fields: Object.assign({}, signatureDeclarationCommon(), {
+    abstract: (0, _utils.validateOptional)(bool)
+  })
+}));
+defineType("TSTypeReference", {
+  aliases: ["TSType"],
+  visitor: ["typeName", "typeParameters"],
+  fields: {
+    typeName: (0, _utils.validateType)("TSEntityName"),
+    ["typeParameters"]: (0, _utils.validateOptionalType)("TSTypeParameterInstantiation")
   }
-  this.tokenChar(91);
-  {
-    this.word(node.typeParameter.name);
+});
+defineType("TSTypePredicate", {
+  aliases: ["TSType"],
+  visitor: ["parameterName", "typeAnnotation"],
+  builder: ["parameterName", "typeAnnotation", "asserts"],
+  fields: {
+    parameterName: (0, _utils.validateType)("Identifier", "TSThisType"),
+    typeAnnotation: (0, _utils.validateOptionalType)("TSTypeAnnotation"),
+    asserts: (0, _utils.validateOptional)(bool)
   }
-  this.space();
-  this.word("in");
-  this.space();
-  {
-    this.print(node.typeParameter.constraint);
+});
+defineType("TSTypeQuery", {
+  aliases: ["TSType"],
+  visitor: ["exprName", "typeParameters"],
+  fields: {
+    exprName: (0, _utils.validateType)("TSEntityName", "TSImportType"),
+    ["typeParameters"]: (0, _utils.validateOptionalType)("TSTypeParameterInstantiation")
   }
-  if (nameType) {
-    this.space();
-    this.word("as");
-    this.space();
-    this.print(nameType);
+});
+defineType("TSTypeLiteral", {
+  aliases: ["TSType"],
+  visitor: ["members"],
+  fields: {
+    members: (0, _utils.validateArrayOfType)("TSTypeElement")
   }
-  this.tokenChar(93);
-  if (optional) {
-    tokenIfPlusMinus(this, optional);
-    this.tokenChar(63);
+});
+defineType("TSArrayType", {
+  aliases: ["TSType"],
+  visitor: ["elementType"],
+  fields: {
+    elementType: (0, _utils.validateType)("TSType")
   }
-  if (typeAnnotation) {
-    this.tokenChar(58);
-    this.space();
-    this.print(typeAnnotation);
+});
+defineType("TSTupleType", {
+  aliases: ["TSType"],
+  visitor: ["elementTypes"],
+  fields: {
+    elementTypes: (0, _utils.validateArrayOfType)("TSType", "TSNamedTupleMember")
   }
-  this.space();
-  exit();
-  this.tokenChar(125);
-}
-function tokenIfPlusMinus(self, tok) {
-  if (tok !== true) {
-    self.token(tok);
+});
+defineType("TSOptionalType", {
+  aliases: ["TSType"],
+  visitor: ["typeAnnotation"],
+  fields: {
+    typeAnnotation: (0, _utils.validateType)("TSType")
   }
-}
-function TSTemplateLiteralType(node) {
-  this._printTemplate(node, node.types);
-}
-function TSLiteralType(node) {
-  this.print(node.literal);
-}
-function TSClassImplements(node) {
-  this.print(node.expression);
-  this.print(node.typeArguments);
-}
-function TSInterfaceDeclaration(node) {
-  const {
-    declare,
-    id,
-    typeParameters,
-    extends: extendz,
-    body
-  } = node;
-  if (declare) {
-    this.word("declare");
-    this.space();
+});
+defineType("TSRestType", {
+  aliases: ["TSType"],
+  visitor: ["typeAnnotation"],
+  fields: {
+    typeAnnotation: (0, _utils.validateType)("TSType")
   }
-  this.word("interface");
-  this.space();
-  this.print(id);
-  this.print(typeParameters);
-  if (extendz != null && extendz.length) {
-    this.space();
-    this.word("extends");
-    this.space();
-    this.printList(extendz);
+});
+defineType("TSNamedTupleMember", {
+  visitor: ["label", "elementType"],
+  builder: ["label", "elementType", "optional"],
+  fields: {
+    label: (0, _utils.validateType)("Identifier"),
+    optional: {
+      validate: bool,
+      default: false
+    },
+    elementType: (0, _utils.validateType)("TSType")
   }
-  this.space();
-  this.print(body);
-}
-function TSInterfaceBody(node) {
-  printBraced(this, node, () => this.printJoin(node.body, true, true));
-}
-function TSTypeAliasDeclaration(node) {
-  const {
-    declare,
-    id,
-    typeParameters,
-    typeAnnotation
-  } = node;
-  if (declare) {
-    this.word("declare");
-    this.space();
+});
+const unionOrIntersection = {
+  aliases: ["TSType"],
+  visitor: ["types"],
+  fields: {
+    types: (0, _utils.validateArrayOfType)("TSType")
   }
-  this.word("type");
-  this.space();
-  this.print(id);
-  this.print(typeParameters);
-  this.space();
-  this.tokenChar(61);
-  this.space();
-  this.print(typeAnnotation);
-  this.semicolon();
-}
-function TSTypeExpression(node) {
-  const {
-    type,
-    expression,
-    typeAnnotation
-  } = node;
-  this.print(expression, true);
-  this.space();
-  this.word(type === "TSAsExpression" ? "as" : "satisfies");
-  this.space();
-  this.print(typeAnnotation);
-}
-function TSTypeAssertion(node) {
-  const {
-    typeAnnotation,
-    expression
-  } = node;
-  this.tokenChar(60);
-  this.print(typeAnnotation);
-  this.tokenChar(62);
-  this.space();
-  this.print(expression);
-}
-function TSInstantiationExpression(node) {
-  this.print(node.expression);
-  {
-    this.print(node.typeParameters);
+};
+defineType("TSUnionType", unionOrIntersection);
+defineType("TSIntersectionType", unionOrIntersection);
+defineType("TSConditionalType", {
+  aliases: ["TSType"],
+  visitor: ["checkType", "extendsType", "trueType", "falseType"],
+  fields: {
+    checkType: (0, _utils.validateType)("TSType"),
+    extendsType: (0, _utils.validateType)("TSType"),
+    trueType: (0, _utils.validateType)("TSType"),
+    falseType: (0, _utils.validateType)("TSType")
   }
-}
-function TSEnumDeclaration(node) {
-  const {
-    declare,
-    const: isConst,
-    id
-  } = node;
-  if (declare) {
-    this.word("declare");
-    this.space();
+});
+defineType("TSInferType", {
+  aliases: ["TSType"],
+  visitor: ["typeParameter"],
+  fields: {
+    typeParameter: (0, _utils.validateType)("TSTypeParameter")
   }
-  if (isConst) {
-    this.word("const");
-    this.space();
+});
+defineType("TSParenthesizedType", {
+  aliases: ["TSType"],
+  visitor: ["typeAnnotation"],
+  fields: {
+    typeAnnotation: (0, _utils.validateType)("TSType")
   }
-  this.word("enum");
-  this.space();
-  this.print(id);
-  this.space();
-  {
-    TSEnumBody.call(this, node);
+});
+defineType("TSTypeOperator", {
+  aliases: ["TSType"],
+  visitor: ["typeAnnotation"],
+  builder: ["typeAnnotation", "operator"],
+  fields: {
+    operator: {
+      validate: (0, _utils.assertValueType)("string"),
+      default: "keyof"
+    },
+    typeAnnotation: (0, _utils.validateType)("TSType")
   }
-}
-function TSEnumBody(node) {
-  printBraced(this, node, () => {
-    var _this$shouldPrintTrai;
-    return this.printList(node.members, (_this$shouldPrintTrai = this.shouldPrintTrailingComma("}")) != null ? _this$shouldPrintTrai : true, true, true);
+});
+defineType("TSIndexedAccessType", {
+  aliases: ["TSType"],
+  visitor: ["objectType", "indexType"],
+  fields: {
+    objectType: (0, _utils.validateType)("TSType"),
+    indexType: (0, _utils.validateType)("TSType")
+  }
+});
+defineType("TSMappedType", {
+  aliases: ["TSType"],
+  visitor: ["typeParameter", "nameType", "typeAnnotation"],
+  builder: ["typeParameter", "typeAnnotation", "nameType"],
+  fields: Object.assign({}, {
+    typeParameter: (0, _utils.validateType)("TSTypeParameter")
+  }, {
+    readonly: (0, _utils.validateOptional)((0, _utils.assertOneOf)(true, false, "+", "-")),
+    optional: (0, _utils.validateOptional)((0, _utils.assertOneOf)(true, false, "+", "-")),
+    typeAnnotation: (0, _utils.validateOptionalType)("TSType"),
+    nameType: (0, _utils.validateOptionalType)("TSType")
+  })
+});
+defineType("TSTemplateLiteralType", {
+  aliases: ["TSType", "TSBaseType"],
+  visitor: ["quasis", "types"],
+  fields: {
+    quasis: (0, _utils.validateArrayOfType)("TemplateElement"),
+    types: {
+      validate: (0, _utils.chain)((0, _utils.assertValueType)("array"), (0, _utils.assertEach)((0, _utils.assertNodeType)("TSType")), function (node, key, val) {
+        if (node.quasis.length !== val.length + 1) {
+          throw new TypeError(`Number of ${node.type} quasis should be exactly one more than the number of types.\nExpected ${val.length + 1} quasis but got ${node.quasis.length}`);
+        }
+      })
+    }
+  }
+});
+defineType("TSLiteralType", {
+  aliases: ["TSType", "TSBaseType"],
+  visitor: ["literal"],
+  fields: {
+    literal: {
+      validate: function () {
+        const unaryExpression = (0, _utils.assertNodeType)("NumericLiteral", "BigIntLiteral");
+        const unaryOperator = (0, _utils.assertOneOf)("-");
+        const literal = (0, _utils.assertNodeType)("NumericLiteral", "StringLiteral", "BooleanLiteral", "BigIntLiteral", "TemplateLiteral");
+        const validator = function validator(parent, key, node) {
+          if ((0, _is.default)("UnaryExpression", node)) {
+            unaryOperator(node, "operator", node.operator);
+            unaryExpression(node, "argument", node.argument);
+          } else {
+            literal(parent, key, node);
+          }
+        };
+        validator.oneOfNodeTypes = ["NumericLiteral", "StringLiteral", "BooleanLiteral", "BigIntLiteral", "TemplateLiteral", "UnaryExpression"];
+        return validator;
+      }()
+    }
+  }
+});
+{
+  defineType("TSExpressionWithTypeArguments", {
+    aliases: ["TSType"],
+    visitor: ["expression", "typeParameters"],
+    fields: {
+      expression: (0, _utils.validateType)("TSEntityName"),
+      typeParameters: (0, _utils.validateOptionalType)("TSTypeParameterInstantiation")
+    }
   });
 }
-function TSEnumMember(node) {
-  const {
-    id,
-    initializer
-  } = node;
-  this.print(id);
-  if (initializer) {
-    this.space();
-    this.tokenChar(61);
-    this.space();
-    this.print(initializer);
+defineType("TSInterfaceDeclaration", {
+  aliases: ["Statement", "Declaration"],
+  visitor: ["id", "typeParameters", "extends", "body"],
+  fields: {
+    declare: (0, _utils.validateOptional)(bool),
+    id: (0, _utils.validateType)("Identifier"),
+    typeParameters: (0, _utils.validateOptionalType)("TSTypeParameterDeclaration"),
+    extends: (0, _utils.validateOptional)((0, _utils.arrayOfType)("TSExpressionWithTypeArguments")),
+    body: (0, _utils.validateType)("TSInterfaceBody")
   }
-}
-function TSModuleDeclaration(node) {
-  const {
-    declare,
-    id,
-    kind
-  } = node;
-  if (declare) {
-    this.word("declare");
-    this.space();
+});
+defineType("TSInterfaceBody", {
+  visitor: ["body"],
+  fields: {
+    body: (0, _utils.validateArrayOfType)("TSTypeElement")
   }
-  {
-    if (!node.global) {
-      this.word(kind != null ? kind : id.type === "Identifier" ? "namespace" : "module");
-      this.space();
+});
+defineType("TSTypeAliasDeclaration", {
+  aliases: ["Statement", "Declaration"],
+  visitor: ["id", "typeParameters", "typeAnnotation"],
+  fields: {
+    declare: (0, _utils.validateOptional)(bool),
+    id: (0, _utils.validateType)("Identifier"),
+    typeParameters: (0, _utils.validateOptionalType)("TSTypeParameterDeclaration"),
+    typeAnnotation: (0, _utils.validateType)("TSType")
+  }
+});
+defineType("TSInstantiationExpression", {
+  aliases: ["Expression"],
+  visitor: ["expression", "typeParameters"],
+  fields: {
+    expression: (0, _utils.validateType)("Expression"),
+    ["typeParameters"]: (0, _utils.validateOptionalType)("TSTypeParameterInstantiation")
+  }
+});
+const TSTypeExpression = {
+  aliases: ["Expression", "LVal", "PatternLike"],
+  visitor: ["expression", "typeAnnotation"],
+  fields: {
+    expression: (0, _utils.validateType)("Expression"),
+    typeAnnotation: (0, _utils.validateType)("TSType")
+  }
+};
+defineType("TSAsExpression", TSTypeExpression);
+defineType("TSSatisfiesExpression", TSTypeExpression);
+defineType("TSTypeAssertion", {
+  aliases: ["Expression", "LVal", "PatternLike"],
+  visitor: ["typeAnnotation", "expression"],
+  fields: {
+    typeAnnotation: (0, _utils.validateType)("TSType"),
+    expression: (0, _utils.validateType)("Expression")
+  }
+});
+defineType("TSEnumBody", {
+  visitor: ["members"],
+  fields: {
+    members: (0, _utils.validateArrayOfType)("TSEnumMember")
+  }
+});
+{
+  defineType("TSEnumDeclaration", {
+    aliases: ["Statement", "Declaration"],
+    visitor: ["id", "members"],
+    fields: {
+      declare: (0, _utils.validateOptional)(bool),
+      const: (0, _utils.validateOptional)(bool),
+      id: (0, _utils.validateType)("Identifier"),
+      members: (0, _utils.validateArrayOfType)("TSEnumMember"),
+      initializer: (0, _utils.validateOptionalType)("Expression"),
+      body: (0, _utils.validateOptionalType)("TSEnumBody")
     }
-    this.print(id);
-    if (!node.body) {
-      this.semicolon();
-      return;
-    }
-    let body = node.body;
-    while (body.type === "TSModuleDeclaration") {
-      this.tokenChar(46);
-      this.print(body.id);
-      body = body.body;
-    }
-    this.space();
-    this.print(body);
-  }
-}
-function TSModuleBlock(node) {
-  printBraced(this, node, () => this.printSequence(node.body, true));
-}
-function TSImportType(node) {
-  const {
-    argument,
-    qualifier,
-    options
-  } = node;
-  this.word("import");
-  this.tokenChar(40);
-  this.print(argument);
-  if (options) {
-    this.tokenChar(44);
-    this.print(options);
-  }
-  this.tokenChar(41);
-  if (qualifier) {
-    this.tokenChar(46);
-    this.print(qualifier);
-  }
-  const typeArguments = node.typeParameters;
-  if (typeArguments) {
-    this.print(typeArguments);
-  }
-}
-function TSImportEqualsDeclaration(node) {
-  const {
-    id,
-    moduleReference
-  } = node;
-  if (node.isExport) {
-    this.word("export");
-    this.space();
-  }
-  this.word("import");
-  this.space();
-  this.print(id);
-  this.space();
-  this.tokenChar(61);
-  this.space();
-  this.print(moduleReference);
-  this.semicolon();
-}
-function TSExternalModuleReference(node) {
-  this.token("require(");
-  this.print(node.expression);
-  this.tokenChar(41);
-}
-function TSNonNullExpression(node) {
-  this.print(node.expression);
-  this.tokenChar(33);
-}
-function TSExportAssignment(node) {
-  this.word("export");
-  this.space();
-  this.tokenChar(61);
-  this.space();
-  this.print(node.expression);
-  this.semicolon();
-}
-function TSNamespaceExportDeclaration(node) {
-  this.word("export");
-  this.space();
-  this.word("as");
-  this.space();
-  this.word("namespace");
-  this.space();
-  this.print(node.id);
-  this.semicolon();
-}
-function tsPrintSignatureDeclarationBase(node) {
-  const {
-    typeParameters
-  } = node;
-  const parameters = node.parameters;
-  this.print(typeParameters);
-  this.tokenChar(40);
-  this._parameters(parameters, ")");
-  const returnType = node.typeAnnotation;
-  this.print(returnType);
-}
-function tsPrintClassMemberModifiers(node) {
-  const isPrivateField = node.type === "ClassPrivateProperty";
-  const isPublicField = node.type === "ClassAccessorProperty" || node.type === "ClassProperty";
-  printModifiersList(this, node, [isPublicField && node.declare && "declare", !isPrivateField && node.accessibility]);
-  if (node.static) {
-    this.word("static");
-    this.space();
-  }
-  printModifiersList(this, node, [!isPrivateField && node.abstract && "abstract", !isPrivateField && node.override && "override", (isPublicField || isPrivateField) && node.readonly && "readonly"]);
-}
-function printBraced(printer, node, cb) {
-  printer.token("{");
-  const exit = printer.enterDelimited();
-  cb();
-  exit();
-  printer.rightBrace(node);
-}
-function printModifiersList(printer, node, modifiers) {
-  var _printer$tokenMap2;
-  const modifiersSet = new Set();
-  for (const modifier of modifiers) {
-    if (modifier) modifiersSet.add(modifier);
-  }
-  (_printer$tokenMap2 = printer.tokenMap) == null || _printer$tokenMap2.find(node, tok => {
-    if (modifiersSet.has(tok.value)) {
-      printer.token(tok.value);
-      printer.space();
-      modifiersSet.delete(tok.value);
-      return modifiersSet.size === 0;
-    }
-    return false;
   });
-  for (const modifier of modifiersSet) {
-    printer.word(modifier);
-    printer.space();
-  }
 }
+defineType("TSEnumMember", {
+  visitor: ["id", "initializer"],
+  fields: {
+    id: (0, _utils.validateType)("Identifier", "StringLiteral"),
+    initializer: (0, _utils.validateOptionalType)("Expression")
+  }
+});
+defineType("TSModuleDeclaration", {
+  aliases: ["Statement", "Declaration"],
+  visitor: ["id", "body"],
+  fields: Object.assign({
+    kind: {
+      validate: (0, _utils.assertOneOf)("global", "module", "namespace")
+    },
+    declare: (0, _utils.validateOptional)(bool)
+  }, {
+    global: (0, _utils.validateOptional)(bool)
+  }, {
+    id: (0, _utils.validateType)("Identifier", "StringLiteral"),
+    body: (0, _utils.validateType)("TSModuleBlock", "TSModuleDeclaration")
+  })
+});
+defineType("TSModuleBlock", {
+  aliases: ["Scopable", "Block", "BlockParent", "FunctionParent"],
+  visitor: ["body"],
+  fields: {
+    body: (0, _utils.validateArrayOfType)("Statement")
+  }
+});
+defineType("TSImportType", {
+  aliases: ["TSType"],
+  builder: ["argument", "qualifier", "typeParameters"],
+  visitor: ["argument", "options", "qualifier", "typeParameters"],
+  fields: {
+    argument: (0, _utils.validateType)("StringLiteral"),
+    qualifier: (0, _utils.validateOptionalType)("TSEntityName"),
+    ["typeParameters"]: (0, _utils.validateOptionalType)("TSTypeParameterInstantiation"),
+    options: {
+      validate: (0, _utils.assertNodeType)("ObjectExpression"),
+      optional: true
+    }
+  }
+});
+defineType("TSImportEqualsDeclaration", {
+  aliases: ["Statement", "Declaration"],
+  visitor: ["id", "moduleReference"],
+  fields: Object.assign({}, {
+    isExport: (0, _utils.validate)(bool)
+  }, {
+    id: (0, _utils.validateType)("Identifier"),
+    moduleReference: (0, _utils.validateType)("TSEntityName", "TSExternalModuleReference"),
+    importKind: {
+      validate: (0, _utils.assertOneOf)("type", "value"),
+      optional: true
+    }
+  })
+});
+defineType("TSExternalModuleReference", {
+  visitor: ["expression"],
+  fields: {
+    expression: (0, _utils.validateType)("StringLiteral")
+  }
+});
+defineType("TSNonNullExpression", {
+  aliases: ["Expression", "LVal", "PatternLike"],
+  visitor: ["expression"],
+  fields: {
+    expression: (0, _utils.validateType)("Expression")
+  }
+});
+defineType("TSExportAssignment", {
+  aliases: ["Statement"],
+  visitor: ["expression"],
+  fields: {
+    expression: (0, _utils.validateType)("Expression")
+  }
+});
+defineType("TSNamespaceExportDeclaration", {
+  aliases: ["Statement"],
+  visitor: ["id"],
+  fields: {
+    id: (0, _utils.validateType)("Identifier")
+  }
+});
+defineType("TSTypeAnnotation", {
+  visitor: ["typeAnnotation"],
+  fields: {
+    typeAnnotation: {
+      validate: (0, _utils.assertNodeType)("TSType")
+    }
+  }
+});
+defineType("TSTypeParameterInstantiation", {
+  visitor: ["params"],
+  fields: {
+    params: (0, _utils.validateArrayOfType)("TSType")
+  }
+});
+defineType("TSTypeParameterDeclaration", {
+  visitor: ["params"],
+  fields: {
+    params: (0, _utils.validateArrayOfType)("TSTypeParameter")
+  }
+});
+defineType("TSTypeParameter", {
+  builder: ["constraint", "default", "name"],
+  visitor: ["constraint", "default"],
+  fields: {
+    name: {
+      validate: (0, _utils.assertValueType)("string")
+    },
+    in: {
+      validate: (0, _utils.assertValueType)("boolean"),
+      optional: true
+    },
+    out: {
+      validate: (0, _utils.assertValueType)("boolean"),
+      optional: true
+    },
+    const: {
+      validate: (0, _utils.assertValueType)("boolean"),
+      optional: true
+    },
+    constraint: {
+      validate: (0, _utils.assertNodeType)("TSType"),
+      optional: true
+    },
+    default: {
+      validate: (0, _utils.assertNodeType)("TSType"),
+      optional: true
+    }
+  }
+});
 
 //# sourceMappingURL=typescript.js.map
