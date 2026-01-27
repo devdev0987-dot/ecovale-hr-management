@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- Include Spring Boot defaults -->
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    
+    <!-- Define properties -->
+    <property name="LOG_FILE" value="${LOG_FILE:-${LOG_PATH:-${LOG_TEMP:-${java.io.tmpdir:-/tmp}}/}ecovale-hr.log}"/>
+    <property name="CONSOLE_LOG_PATTERN" value="${CONSOLE_LOG_PATTERN:-%clr(%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd HH:mm:ss.SSS}}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr([%15.15t]){faint} %clr([%X{correlationId}]){cyan} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}}"/>
+    
+    <!-- Console Appender (Development) -->
+    <springProfile name="dev,local">
+        <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+                <charset>UTF-8</charset>
+            </encoder>
+        </appender>
+    </springProfile>
+    
+    <!-- Console Appender with JSON (Production) -->
+    <springProfile name="prod">
+        <appender name="CONSOLE_JSON" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+                <includeMdcKeyName>correlationId</includeMdcKeyName>
+                <includeMdcKeyName>userId</includeMdcKeyName>
+                <includeMdcKeyName>requestId</includeMdcKeyName>
+                <includeMdcKeyName>clientIp</includeMdcKeyName>
+                <fieldNames>
+                    <timestamp>timestamp</timestamp>
+                    <version>[ignore]</version>
+                    <levelValue>[ignore]</levelValue>
+                </fieldNames>
+                <customFields>{"application":"ecovale-hr","environment":"${SPRING_PROFILES_ACTIVE:-prod}"}</customFields>
+                <throwableConverter class="net.logstash.logback.stacktrace.ShortenedThrowableConverter">
+                    <maxDepthPerThrowable>30</maxDepthPerThrowable>
+                    <maxLength>2048</maxLength>
+                    <shortenedClassNameLength>20</shortenedClassNameLength>
+                    <exclude>sun\.reflect\..*</exclude>
+                    <exclude>net\.sf\.cglib\..*</exclude>
+                    <rootCauseFirst>true</rootCauseFirst>
+                </throwableConverter>
+            </encoder>
+        </appender>
+    </springProfile>
+    
+    <!-- File Appender with Rolling -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_FILE}</file>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <includeMdcKeyName>correlationId</includeMdcKeyName>
+            <includeMdcKeyName>userId</includeMdcKeyName>
+            <includeMdcKeyName>requestId</includeMdcKeyName>
+            <includeMdcKeyName>clientIp</includeMdcKeyName>
+            <customFields>{"application":"ecovale-hr","environment":"${SPRING_PROFILES_ACTIVE:-prod}"}</customFields>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_FILE}.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+            <maxFileSize>50MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>1GB</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+    
+    <!-- Async Appenders for better performance -->
+    <appender name="ASYNC_CONSOLE" class="ch.qos.logback.classic.AsyncAppender">
+        <queueSize>512</queueSize>
+        <discardingThreshold>0</discardingThreshold>
+        <springProfile name="dev,local">
+            <appender-ref ref="CONSOLE"/>
+        </springProfile>
+        <springProfile name="prod">
+            <appender-ref ref="CONSOLE_JSON"/>
+        </springProfile>
+    </appender>
+    
+    <appender name="ASYNC_FILE" class="ch.qos.logback.classic.AsyncAppender">
+        <queueSize>512</queueSize>
+        <discardingThreshold>0</discardingThreshold>
+        <appender-ref ref="FILE"/>
+    </appender>
+    
+    <!-- Application Loggers -->
+    <logger name="com.ecovale.hr" level="${LOGGING_LEVEL_APP:-INFO}"/>
+    
+    <!-- Security Logging -->
+    <logger name="com.ecovale.hr.security" level="${LOGGING_LEVEL_SECURITY:-INFO}"/>
+    <logger name="com.ecovale.hr.security.RequestLoggingFilter" level="${LOGGING_LEVEL_REQUEST_LOGGING:-DEBUG}"/>
+    
+    <!-- Audit Logging -->
+    <logger name="com.ecovale.hr.service.AuditLogService" level="INFO"/>
+    <logger name="com.ecovale.hr.aspect.AuditAspect" level="INFO"/>
+    
+    <!-- Spring Framework -->
+    <logger name="org.springframework.web" level="${LOGGING_LEVEL_SPRING_WEB:-WARN}"/>
+    <logger name="org.springframework.security" level="${LOGGING_LEVEL_SPRING_SECURITY:-WARN}"/>
+    <logger name="org.springframework.boot.actuate" level="INFO"/>
+    
+    <!-- Database -->
+    <logger name="org.hibernate.SQL" level="${LOGGING_LEVEL_SQL:-WARN}"/>
+    <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="${LOGGING_LEVEL_SQL_PARAMS:-WARN}"/>
+    
+    <!-- Metrics -->
+    <logger name="io.micrometer" level="INFO"/>
+    
+    <!-- Root Logger -->
+    <root level="${LOGGING_LEVEL_ROOT:-INFO}">
+        <appender-ref ref="ASYNC_CONSOLE"/>
+        <springProfile name="!test">
+            <appender-ref ref="ASYNC_FILE"/>
+        </springProfile>
+    </root>
+</configuration>
