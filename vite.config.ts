@@ -17,8 +17,10 @@ export default defineConfig(({ mode }) => {
         sourcemap: true,
       },
       define: {
-        'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY),
-        'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY)
+        // Use import.meta.env instead of process.env for Vite
+        // The VITE_ prefix variables are automatically available via import.meta.env
+        // Only define if you need to explicitly pass them
+        'import.meta.env.VITE_GEMINI_API_KEY': JSON.stringify(env.VITE_GEMINI_API_KEY)
       },
       resolve: {
         alias: {
