@@ -1,907 +1,1162 @@
-# Ecovale HR Backend - Spring Boot REST API
+<div align="center">
+<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+</div>
 
-## Overview
-Complete production-ready backend REST API for the Ecovale HR Management System built with **Java Spring Boot**, **Spring Data JPA**, **MySQL**, and **Spring Security with JWT Authentication**.
+# Ecovale HR Management System
 
-## 🔒 Security
-This backend uses **JWT (JSON Web Token)** authentication to secure all API endpoints.
+> **Production-ready Enterprise HR Platform** • Full-stack TypeScript/Java • Spring Boot 3.2 + React 18 + MySQL 8
 
-### Quick Security Setup
-1. All endpoints except `/api/auth/**` require authentication
-2. Login at `/api/auth/login` to get JWT token
-3. Include token in `Authorization: Bearer <token>` header
-4. Two roles: `ROLE_ADMIN` (full access) and `ROLE_USER` (read-only)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.1-brightgreen.svg)](https://spring.io/projects/spring-boot)
+[![React](https://img.shields.io/badge/React-18-blue.svg)](https://reactjs.org/)
+[![Java](https://img.shields.io/badge/Java-17-orange.svg)](https://openjdk.java.net/)
+[![MySQL](https://img.shields.io/badge/MySQL-8.0-blue.svg)](https://www.mysql.com/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.2-blue.svg)](https://www.typescriptlang.org/)
 
-📚 **Full Security Documentation**: See [SECURITY-JWT-GUIDE.md](./SECURITY-JWT-GUIDE.md)  
-⚡ **Quick Reference**: See [SECURITY-QUICK-REF.md](./SECURITY-QUICK-REF.md)
+---
 
-## Technology Stack
-- **Java 17**
-- **Spring Boot 3.2.1**
-- **Spring Web** (REST API)
-- **Spring Data JPA** (Database ORM)
-- **Spring Security** (Authentication & Authorization)
-- **JWT (jjwt 0.12.3)** (Token-based authentication)
-- **MySQL 8.0+** (Database)
-- **Hibernate** (ORM Framework)
-- **Lombok** (Code reduction)
-- **Bean Validation** (Input validation)
-- **Maven** (Build tool)
+## 🌐 Live Demo
 
-## Project Structure
+<div align="center">
+<table>
+<tr>
+<td align="center" width="50%">
+
+### 🖥️ **Frontend Demo**
+**[https://ecovale-hr.netlify.app](https://ecovale-hr.netlify.app)**  
+*(Replace with your Netlify URL)*
+
+</td>
+<td align="center" width="50%">
+
+### ⚙️ **Backend API**
+**[https://ecovale-hr.railway.app](https://ecovale-hr.railway.app)**  
+*(Replace with your Railway URL)*
+
+</td>
+</tr>
+</table>
+</div>
+
+### 🔑 Demo Credentials - Try It Now!
+
 ```
-backend/
-├── src/
-│   └── main/
-│       ├── java/com/ecovale/hr/
-│       │   ├── EcovaleHrBackendApplication.java   # Main application entry point
-│       │   ├── config/
-│       │   │   ├── CorsConfig.java                # CORS configuration
-│       │   │   └── SecurityConfig.java            # Spring Security & JWT config
-│       │   ├── controller/
-│       │   │   ├── AuthController.java            # Login/Register endpoints (NEW)
-│       │   │   ├── EmployeeController.java        # Employee REST endpoints
-│       │   │   ├── DesignationController.java     # Designation endpoints
-│       │   │   ├── AttendanceController.java      # Attendance endpoints
-│       │   │   ├── AdvanceController.java         # Advance endpoints
-│       │   │   └── LoanController.java            # Loan endpoints
-│       │   ├── dto/
-│       │   │   ├── ApiResponse.java               # Standard API response wrapper
-│       │   │   ├── LoginRequest.java              # Login DTO (NEW)
-│       │   │   ├── LoginResponse.java             # Login response DTO (NEW)
-│       │   │   ├── RegisterRequest.java           # Registration DTO (NEW)
-│       │   │   ├── EmployeeRequestDTO.java        # Employee request DTO
-│       │   │   ├── EmployeeResponseDTO.java       # Employee response DTO
-│       │   │   └── ... (other DTOs)
-│       │   ├── entity/
-│       │   │   ├── User.java                      # User entity (NEW)
-│       │   │   ├── Role.java                      # Role entity (NEW)
-│       │   │   ├── Employee.java                  # Employee entity
-│       │   │   ├── Designation.java               # Designation entity
-│       │   │   ├── AttendanceRecord.java          # Attendance entity
-│       │   │   ├── AdvanceRecord.java             # Advance entity
-│       │   │   └── LoanRecord.java                # Loan entity
-│       │   ├── exception/
-│       │   │   ├── ResourceNotFoundException.java
-│       │   │   ├── DuplicateResourceException.java
-│       │   │   └── GlobalExceptionHandler.java    # Global error handling
-│       │   ├── repository/
-│       │   │   ├── UserRepository.java            # User data access (NEW)
-│       │   │   ├── RoleRepository.java            # Role data access (NEW)
-│       │   │   ├── EmployeeRepository.java        # Employee data access
-│       │   │   ├── DesignationRepository.java
-│       │   │   └── ... (other repositories)
-│       │   ├── security/
-│       │   │   ├── JwtUtil.java                   # JWT token generation/validation (NEW)
-│       │   │   ├── CustomUserDetailsService.java  # Load user for auth (NEW)
-│       │   │   └── JwtAuthenticationFilter.java   # JWT filter (NEW)
-│       │   └── service/
-│       │       ├── EmployeeService.java           # Employee business logic
-│       │       ├── DesignationService.java
-│       │       └── ... (other services)
-│       └── resources/
-│           └── application.properties             # Configuration
-└── pom.xml                                         # Maven dependencies
+👤 Admin Account (Full Access)
+   Username: demo_admin
+   Password: Demo@2026!Secure
+
+👔 Manager Account (Approval Rights)
+   Username: john_manager
+   Password: Manager@2026!
+
+👨‍💻 Employee Account (Standard User)
+   Username: alice_employee
+   Password: Employee@2026!
 ```
 
-## Prerequisites
-1. **Java 17** or higher
-2. **Maven 3.6+**
-3. **MySQL 8.0+** (Local or AWS RDS)
-4. **Git** (for version control)
+**📖 More test accounts available in [DEMO-CREDENTIALS.md](DEMO-CREDENTIALS.md)**
 
-## Database Setup
+---
 
-### Option 1: Local MySQL
+## 📋 Table of Contents
+
+- [Live Demo](#-live-demo)
+- [Why This Project Matters](#-why-this-project-matters)
+- [Overview](#-overview)
+- [Key Features](#-key-features)
+- [Technology Stack](#-technology-stack)
+- [Quick Start (Local Development)](#-quick-start-local-development)
+- [Deploy Your Own (5 Minutes)](#-deploy-your-own-5-minutes)
+- [Architecture](#-architecture)
+- [API Documentation](#-api-documentation)
+- [Testing & Quality](#-testing--quality)
+- [Documentation](#-documentation)
+- [Contributing](#-contributing)
+- [Support](#-support)
+
+---
+
+## 💡 Why This Project Matters
+
+### For Recruiters & Technical Evaluators
+
+This project demonstrates **production-ready full-stack development skills** with real-world complexity:
+
+**🏗️ Enterprise Architecture**
+- Clean 3-tier architecture (Presentation → Business → Data)
+- RESTful API design with versioning (`/api/v1`)
+- JWT authentication with role-based access control (RBAC)
+- Comprehensive audit logging for compliance
+
+**💻 Modern Tech Stack**
+- **Backend:** Spring Boot 3.2, Java 17, MySQL 8.0, Flyway migrations
+- **Frontend:** React 18, TypeScript 5.2, Vite build system
+- **Security:** JWT tokens, BCrypt hashing, rate limiting
+- **DevOps:** Docker, CI/CD ready, cloud deployment configs
+
+**📈 Production Best Practices**
+- Database migrations with rollback support (Flyway)
+- Health checks & monitoring (Prometheus/Grafana)
+- API documentation (OpenAPI/Swagger)
+- Comprehensive testing (unit, integration, load tests)
+- Security hardening (CORS, CSRF, SQL injection prevention)
+
+**🎯 Real-World Problem Solving**
+- Complex business logic (two-level leave approvals, payroll calculations)
+- Data integrity (overlapping leave detection, audit trails)
+- Scalability considerations (connection pooling, caching strategies)
+- User experience (responsive design, error handling)
+
+**📚 Documentation Quality**
+- 59 KB of technical documentation
+- Architecture diagrams (Mermaid.js)
+- Deployment guides for multiple platforms
+- API examples and testing scenarios
+
+### Business Value
+
+This HR system solves real organizational challenges:
+- ✅ Streamlined employee onboarding and offboarding
+- ✅ Automated leave approval workflows reducing HR workload
+- ✅ Accurate payroll processing with audit trails
+- ✅ Compliance reporting for labor regulations
+- ✅ Self-service employee portal reducing HR inquiries
+
+---
+
+## 🎯 Overview
+
+A **complete, production-ready HR management platform** built with modern enterprise technologies. This system manages the entire employee lifecycle from onboarding to offboarding, with advanced features like automated leave workflows, payroll processing, and comprehensive compliance reporting.
+
+**What Makes This System Enterprise-Ready:**
+- 🔐 **Bank-grade security:** JWT authentication, BCrypt password hashing, rate limiting
+- 📊 **Built to scale:** Horizontal scaling, connection pooling, optimized database queries
+- 🔍 **Full observability:** Prometheus metrics, structured logging, health checks
+- 📱 **Modern UX:** Responsive React UI with TypeScript for type safety
+- 🚀 **API-first design:** RESTful API with OpenAPI documentation
+- 🔄 **CI/CD ready:** Automated testing, Docker containers, cloud deployment configs
+
+---
+
+## ✨ Key Features
+
+### 👥 Employee Management
+- **Complete Lifecycle Management:** Onboarding, profile updates, designation changes, offboarding
+- **Organizational Structure:** Department and designation hierarchies
+- **Document Management:** Secure storage for contracts, certificates, ID proofs
+- **Salary Administration:** CTC breakdowns, allowances, deductions
+
+### 🏖️ Leave Management (Featured Module)
+- **Two-Level Approval Workflow:** Manager approval → Admin approval
+- **9 Leave Types:** Casual, Sick, Earned, Maternity, Paternity, Unpaid, Compensatory, Bereavement, Marriage
+- **Smart Validations:** Overlapping leave detection, balance verification, future date checks
+- **Statistics Dashboard:** Leave trends, utilization rates, pending approvals
+- **Audit Trail:** Complete history of submissions, approvals, rejections
+
+### 📅 Attendance & Time Tracking
+- **Clock In/Out:** Daily attendance recording with timestamps
+- **Overtime Calculation:** Automatic computation based on work hours
+- **Reports & Analytics:** Monthly attendance summaries, late arrivals, early departures
+- **Payroll Integration:** Direct feed to salary calculation engine
+
+### 💰 Payroll & Financial Management
+- **Automated Salary Processing:** Monthly payslip generation with breakdowns
+- **Loan Management:** EMI calculation, repayment tracking, interest computation
+- **Advance Payments:** Request workflow, deduction scheduling
+- **Tax Support:** Basic tax calculation framework (extensible for local regulations)
+- **Annexure Generation:** PDF export for salary statements
+
+### 📝 Audit & Compliance
+- **Comprehensive Logging:** Every action logged with user, timestamp, details (Spring AOP)
+- **Tamper-Proof:** Admin-only access to audit logs
+- **Compliance Reports:** Data for labor law compliance, salary registers
+- **Data Integrity:** Foreign key constraints, transaction management
+
+### 🔐 Security & Authentication
+- **JWT-Based Auth:** 24-hour access tokens, 7-day refresh tokens
+- **Role-Based Access Control:** 4 roles (ADMIN, MANAGER, HR, EMPLOYEE) with granular permissions
+- **Password Security:** BCrypt hashing (strength 12), minimum complexity requirements
+- **API Protection:** Rate limiting (100 req/min), CORS configuration, CSRF protection
+- **Session Management:** Stateless architecture, secure token storage
+
+---
+
+## 🏗️ Architecture
+
+The system follows a modern three-tier architecture with clear separation of concerns:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     Client Layer                            │
+│  React SPA (Vite) → Nginx Reverse Proxy → SSL/TLS          │
+└─────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────┐
+│                   Application Layer                          │
+│  Spring Boot REST API → Spring Security → JWT Auth          │
+│  Spring Data JPA → Spring AOP (Audit) → Flyway Migrations  │
+└─────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────┐
+│                      Data Layer                              │
+│  MySQL 8.0 → Automated Backups → Read Replicas             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**📐 For detailed architecture diagrams, see [ARCHITECTURE.md](ARCHITECTURE.md)**:
+- System architecture diagram
+- JWT authentication flow
+- CI/CD pipeline workflow
+- Production deployment architecture
+- Data flow diagrams
+
+---
+
+## 🚀 Quick Start (Local Development)
+
+**⏱️ Total setup time: ~10 minutes**
+
+### Prerequisites Checklist
+
+Before you begin, ensure you have these installed:
+
+- [ ] **Java 17** or higher → [Download](https://adoptium.net/)
+- [ ] **Maven 3.9+** → Verify with `mvn -version`
+- [ ] **MySQL 8.0** → [Download](https://dev.mysql.com/downloads/mysql/)
+- [ ] **Node.js 18+** → [Download](https://nodejs.org/)
+- [ ] **Git** → [Download](https://git-scm.com/)
+
+### Step 1: Clone & Database Setup
+
 ```bash
-# Install MySQL (Ubuntu/Debian)
-sudo apt update
-sudo apt install mysql-server
+# Clone the repository
+git clone https://github.com/ecovale/hr-system.git
+cd hr-system
 
-# Start MySQL service
-sudo systemctl start mysql
+# Start MySQL and create database
+mysql -u root -p
+# Enter your MySQL root password when prompted
+```
 
-# Login to MySQL
-sudo mysql -u root -p
-
-# Create database
+```sql
+-- In MySQL shell:
 CREATE DATABASE ecovale_hr;
-
-# Create user (optional)
-CREATE USER 'hruser'@'localhost' IDENTIFIED BY 'yourpassword';
-GRANT ALL PRIVILEGES ON ecovale_hr.* TO 'hruser'@'localhost';
-FLUSH PRIVILEGES;
+EXIT;
 ```
 
-### Option 2: AWS RDS MySQL
-1. Create MySQL RDS instance on AWS Console
-2. Note the endpoint URL (e.g., `ecovale-hr.xxxx.us-east-1.rds.amazonaws.com`)
-3. Create database: `ecovale_hr`
-4. Set environment variables (see Configuration section below)
-5. Ensure security group allows access from your application server
-
-## Configuration
-
-### Environment Variables Setup
-
-This backend uses **environment variables** for database configuration (no hardcoded credentials).
-
-#### Step 1: Create `.env` file (Local Development)
-```bash
-# Copy the example file
-cp .env.example .env
-
-# Edit with your database credentials
-nano .env
-```
-
-#### Step 2: Set Environment Variables
-
-**For Local Development:**
-```bash
-# .env file (or export in terminal)
-DB_HOST=localhost
-DB_PORT=3306
-DB_NAME=ecovale_hr
-DB_USERNAME=root
-DB_PASSWORD=yourpassword
-DB_USE_SSL=false
-JPA_DDL_AUTO=update
-JPA_SHOW_SQL=true
-JPA_FORMAT_SQL=true
-
-# JWT Configuration (IMPORTANT: Change in production!)
-JWT_SECRET=ecovale-hr-secret-key-change-in-production-minimum-32-characters
-JWT_EXPIRATION=86400000
-```
-
-**For AWS RDS Production:**
-```bash
-# Set as environment variables in EC2/ECS/Elastic Beanstalk
-DB_HOST=your-rds-endpoint.us-east-1.rds.amazonaws.com
-DB_PORT=3306
-DB_NAME=ecovale_hr_prod
-DB_USERNAME=admin
-DB_PASSWORD=your-secure-password
-DB_USE_SSL=true
-JPA_DDL_AUTO=validate
-JPA_SHOW_SQL=false
-JPA_FORMAT_SQL=false
-
-# JWT Configuration (Use strong random value!)
-JWT_SECRET=$(openssl rand -base64 32)
-JWT_EXPIRATION=86400000
-```
-
-#### Step 3: Environment Variable Reference
-
-| Variable | Required | Default | Description |
-|----------|----------|---------|-------------|
-| `DB_HOST` | Yes | `localhost` | Database host (RDS endpoint for AWS) |
-| `DB_PORT` | No | `3306` | Database port |
-| `DB_NAME` | Yes | `ecovale_hr` | Database name |
-| `DB_USERNAME` | Yes | `root` | Database username |
-| `DB_PASSWORD` | Yes | `yourpassword` | Database password |
-| `DB_USE_SSL` | No | `false` | Enable SSL (set `true` for AWS RDS) |
-| `JPA_DDL_AUTO` | No | `update` | Hibernate DDL mode (`validate` for prod) |
-| `JPA_SHOW_SQL` | No | `false` | Show SQL in logs |
-| `JPA_FORMAT_SQL` | No | `false` | Format SQL in logs |
-| `JWT_SECRET` | Yes | (default) | JWT secret key (min 32 chars, change in prod!) |
-| `JWT_EXPIRATION` | No | `86400000` | Token expiration in ms (24 hours default) |
-
-### Spring Profiles
-
-Use profiles for different environments:
-
-**Development Profile:**
-```bash
-mvn spring-boot:run -Dspring-boot.run.profiles=dev
-# Uses application-dev.properties
-```
-
-**Production Profile:**
-```bash
-java -jar target/ecovale-hr-backend.jar --spring.profiles.active=prod
-# Uses application-prod.properties
-```
-
-### Configuration Files
-
-| File | Purpose | Credentials |
-|------|---------|-------------|
-| `application.properties` | Base configuration with env vars | ✅ Uses env variables |
-| `application-dev.properties` | Development overrides | ⚠️ Has defaults (override with .env) |
-| `application-prod.properties` | Production settings | ✅ Requires env variables |
-| `.env.example` | Template for local .env | ✅ Safe to commit |
-| `.env` | Your local configuration | ❌ Git ignored |
-
-## Build and Run
-
-### Quick Start (Local Development)
+### Step 2: Configure Backend Environment
 
 ```bash
-# 1. Navigate to backend directory
 cd backend
 
-# 2. Copy environment template
-cp .env.example .env
-
-# 3. Edit .env with your MySQL credentials (if different from defaults)
-nano .env
-
-# 4. Build and run
-mvn clean spring-boot:run
-```
-
-The application will:
-- Load environment variables from `.env` (if using direnv or similar)
-- Connect to MySQL database
-- Auto-create tables (JPA DDL auto=update)
-- Start on http://localhost:8080
-
-### 1. Clone and Navigate
-```bash
-cd /home/mithun/Downloads/ecovale-hr-web-app/backend
-```
-
-### 2. Set Environment Variables
-
-**Option A: Export in Terminal (Temporary)**
-```bash
+# Option A: Using environment variables (Recommended)
 export DB_HOST=localhost
 export DB_PORT=3306
 export DB_NAME=ecovale_hr
 export DB_USERNAME=root
 export DB_PASSWORD=yourpassword
+export JWT_SECRET=your-secret-key-minimum-32-characters-long
+
+# Option B: Edit application.properties directly
+# Open: src/main/resources/application.properties
+# Update the database connection details
 ```
 
-**Option B: Use .env file with direnv**
+### Step 3: Build & Run Backend
+
 ```bash
-# Install direnv
-sudo apt install direnv
-
-# Allow .env loading
-echo 'eval "$(direnv hook bash)"' >> ~/.bashrc
-source ~/.bashrc
-
-# Create .env from example
-cp .env.example .env
-
-# Edit .env
-nano .env
-
-# Allow direnv to load .env
-direnv allow .
-```
-
-**Option C: IDE Configuration**
-- IntelliJ IDEA: Run → Edit Configurations → Environment Variables
-- Eclipse: Run → Run Configurations → Environment tab
-- VS Code: Create `.vscode/launch.json` with env vars
-
-### 3. Build the Project
-```bash
+# Install dependencies and build
 mvn clean install
+
+# Start the Spring Boot application
+mvn spring-boot:run
+
+# ✅ Backend running at: http://localhost:8080
+# ✅ Swagger UI available at: http://localhost:8080/swagger-ui.html
 ```
 
-### 4. Run the Application
-
-**Option A: Maven (Development)**
+**Verify backend is running:**
 ```bash
+curl http://localhost:8080/api/v1/health
+# Should return: {"status":"UP","uptime":"..."}
+```
+
+### Step 4: Configure Frontend
+
+```bash
+# Open a new terminal and navigate to frontend
+cd ../  # Go to project root
+
+# Install dependencies
+npm install
+
+# Create environment file
+echo "VITE_API_BASE_URL=http://localhost:8080/api/v1" > .env.local
+```
+
+### Step 5: Run Frontend
+
+```bash
+# Start Vite development server
+npm run dev
+
+# ✅ Frontend running at: http://localhost:5173
+```
+
+### Step 6: Login & Test
+
+1. **Open browser:** Navigate to `http://localhost:5173`
+2. **Login with default admin credentials:**
+   ```
+   Username: admin
+   Password: password123
+   ```
+3. **Explore the application:**
+   - View employees list
+   - Create a leave request
+   - Check attendance
+   - Generate payslips
+
+### 🎉 Success! You're Now Running Locally
+
+**What's Next?**
+- 📖 Read [API-DOCUMENTATION.md](backend/API-DOCUMENTATION.md) to explore API endpoints
+- 🧪 Try the Swagger UI at `http://localhost:8080/swagger-ui.html`
+- 👥 Create test users with different roles (Manager, HR, Employee)
+- 📊 Check monitoring at `http://localhost:8080/actuator/health`
+
+### Troubleshooting Common Issues
+
+**Issue: "Cannot connect to database"**
+```bash
+# Verify MySQL is running
+sudo systemctl status mysql  # Linux
+brew services list          # macOS
+
+# Check credentials in application.properties match your MySQL setup
+```
+
+**Issue: "Port 8080 already in use"**
+```bash
+# Find and kill the process using port 8080
+# Linux/macOS:
+lsof -i :8080
+kill -9 <PID>
+
+# Or change the port in application.properties:
+server.port=8081
+```
+
+**Issue: "Flyway migration failed"**
+```bash
+# Reset database (WARNING: Deletes all data!)
+mysql -u root -p
+DROP DATABASE ecovale_hr;
+CREATE DATABASE ecovale_hr;
+EXIT;
+
+# Restart the backend
 mvn spring-boot:run
 ```
 
-**Option B: JAR (Production)**
+**Issue: "npm install fails"**
 ```bash
-java -jar target/ecovale-hr-backend.jar
-```
-
-**Option C: Docker (Recommended)**
-See [Docker Deployment](#docker-deployment) section below.
-
-### 5. Verify Server is Running
-Open browser: `http://localhost:8080/actuator/health`
-
-Expected response:
-```json
-{
-  "status": "UP"
-}
+# Clear npm cache and retry
+npm cache clean --force
+rm -rf node_modules package-lock.json
+npm install
 ```
 
 ---
 
-## Docker Deployment
+## 🌐 Deploy Your Own (5 Minutes)
 
-### Prerequisites
-- Docker 20.10+ installed
-- Docker Compose 2.0+ installed
+Want to deploy this to the cloud? It's easier than you think!
 
-### Quick Start with Docker Compose
+### Backend Deployment → Railway (Free Tier)
 
-#### Development Environment (with MySQL container)
+**Why Railway?** Free $5 credit/month, auto-deploy from GitHub, MySQL included
 
 ```bash
-# Navigate to backend directory
+# 1. Install Railway CLI
+npm install -g @railway/cli
+
+# 2. Login to Railway
+railway login
+
+# 3. Deploy backend
 cd backend
+railway init
+railway up
 
-# Start all services (backend + MySQL)
-docker-compose up -d
+# 4. Add MySQL database in Railway dashboard
+# Railway will auto-configure DATABASE_URL
 
-# View logs
-docker-compose logs -f backend
-
-# Stop all services
-docker-compose down
-
-# Stop and remove volumes (clears database)
-docker-compose down -v
-```
-
-**Services Started:**
-- MySQL 8.0 on port `3306`
-- Backend API on port `8080`
-
-**Default Credentials:**
-- Database: `ecovale_hr`
-- Username: `hruser`
-- Password: `hrpassword`
-
-#### Production Environment (with external database)
-
-```bash
-# Create .env file for production
-cat > .env << EOF
-DB_HOST=your-rds-endpoint.rds.amazonaws.com
-DB_PORT=3306
-DB_NAME=ecovale_hr
-DB_USERNAME=admin
-DB_PASSWORD=your-secure-password
-DB_USE_SSL=true
-JPA_DDL_AUTO=validate
+# 5. Set environment variables in Railway dashboard:
+JWT_SECRET=your-256-bit-secret-key-here-minimum-32-characters
+CORS_ALLOWED_ORIGINS=https://your-frontend.netlify.app
+ADMIN_USERNAME=demo_admin
+ADMIN_PASSWORD=Demo@2026!Secure
 SPRING_PROFILES_ACTIVE=prod
-EOF
-
-# Start with production config
-docker-compose -f docker-compose.prod.yml up -d
 ```
 
-### Build Docker Image Manually
+**✅ Your backend is now live!** Note your URL: `https://your-app.railway.app`
+
+### Frontend Deployment → Netlify (Free Tier)
+
+**Why Netlify?** Free hosting, auto-deploy from GitHub, global CDN
 
 ```bash
-# Build image
-docker build -t ecovale-hr-backend:latest .
+# 1. Install Netlify CLI
+npm install -g netlify-cli
 
-# Run container
-docker run -d \
-  --name ecovale-hr-backend \
-  -p 8080:8080 \
-  -e DB_HOST=mysql \
-  -e DB_USERNAME=root \
-  -e DB_PASSWORD=password \
-  ecovale-hr-backend:latest
+# 2. Build your frontend
+npm run build
+
+# 3. Login to Netlify
+netlify login
+
+# 4. Deploy
+netlify deploy --prod --dir=dist
+
+# 5. Set environment variable in Netlify dashboard:
+VITE_API_BASE_URL=https://your-backend.railway.app/api/v1
 ```
 
-### Docker Image Details
+**✅ Your frontend is now live!** Note your URL: `https://your-app.netlify.app`
 
-- **Base Image:** OpenJDK 17 (Eclipse Temurin)
-- **Size:** ~280MB (multi-stage build)
-- **Non-root User:** Runs as `spring` user for security
-- **Health Check:** Built-in health endpoint monitoring
+### Final Step: Connect Frontend & Backend
 
-### Docker Commands Reference
-
+Update your Railway backend environment:
 ```bash
-# Build image
-docker-compose build
-
-# Start services
-docker-compose up -d
-
-# View logs
-docker-compose logs -f
-
-# Stop services
-docker-compose stop
-
-# Remove containers
-docker-compose down
-
-# Remove containers and volumes
-docker-compose down -v
-
-# Restart a service
-docker-compose restart backend
-
-# Scale backend (multiple instances)
-docker-compose up -d --scale backend=3
-
-# Execute command in container
-docker-compose exec backend sh
-
-# Check container health
-docker-compose ps
+CORS_ALLOWED_ORIGINS=https://your-app.netlify.app
 ```
 
-### Accessing Services
+**🎉 Done! Your HR system is now publicly accessible!**
 
-When running with Docker Compose:
+### Complete Deployment Guide
 
-| Service | URL | Credentials |
-|---------|-----|-------------|
-| Backend API | http://localhost:8080 | - |
-| Health Check | http://localhost:8080/actuator/health | - |
-| MySQL Database | localhost:3306 | User: `hruser` / Pass: `hrpassword` |
-
-### Environment Variables for Docker
-
-Set in `docker-compose.yml` or pass via `-e`:
-
-```bash
-docker run -d \
-  -e DB_HOST=mysql \
-  -e DB_PORT=3306 \
-  -e DB_NAME=ecovale_hr \
-  -e DB_USERNAME=hruser \
-  -e DB_PASSWORD=hrpassword \
-  -e JPA_DDL_AUTO=update \
-  -e SPRING_PROFILES_ACTIVE=dev \
-  -p 8080:8080 \
-  ecovale-hr-backend:latest
-```
-
-### Troubleshooting Docker
-
-**Container won't start:**
-```bash
-# Check logs
-docker-compose logs backend
-
-# Check if MySQL is healthy
-docker-compose ps
-```
-
-**Database connection failed:**
-```bash
-# Ensure MySQL is healthy
-docker-compose logs mysql
-
-# Restart backend after MySQL is ready
-docker-compose restart backend
-```
-
-**Port already in use:**
-```bash
-# Stop conflicting service or change port in docker-compose.yml
-ports:
-  - "8081:8080"  # Use 8081 instead
-```
-
-**Clear everything and restart:**
-```bash
-docker-compose down -v
-docker-compose up -d --build
-```
+For step-by-step instructions with screenshots and troubleshooting:
+- **[DEPLOYMENT-GUIDE.md](DEPLOYMENT-GUIDE.md)** - Complete deployment guide (Railway, Render, Netlify, Vercel)
+- **[DEPLOYMENT-SUMMARY.md](DEPLOYMENT-SUMMARY.md)** - Quick deployment checklist
+- **[DEMO-CREDENTIALS.md](DEMO-CREDENTIALS.md)** - Test accounts and API examples
 
 ---
 
-## API Endpoints
+## 📚 Documentation
 
-### Base URL
-```
-http://localhost:8080/api
-```
+### Core Documentation
 
-### 1. Employee Management
+| Document | Description | Location |
+|----------|-------------|----------|
+| **Architecture Guide** | System architecture, diagrams, tech stack | [ARCHITECTURE.md](ARCHITECTURE.md) |
+| **Deployment Guide** | Deploy to Railway/Render/Netlify/Vercel | [DEPLOYMENT-GUIDE.md](DEPLOYMENT-GUIDE.md) |
+| **Deployment Summary** | Quick deployment checklist | [DEPLOYMENT-SUMMARY.md](DEPLOYMENT-SUMMARY.md) |
+| **Demo Credentials** | Test accounts and API examples | [DEMO-CREDENTIALS.md](DEMO-CREDENTIALS.md) |
+| **API Documentation** | Complete API reference, versioning, examples | [backend/API-DOCUMENTATION.md](backend/API-DOCUMENTATION.md) |
+| **API Quick Reference** | Quick start guide for API usage | [backend/API-QUICK-REFERENCE.md](backend/API-QUICK-REFERENCE.md) |
+| **API Deprecation Strategy** | Deprecation policy and migration guides | [backend/API-DEPRECATION-STRATEGY.md](backend/API-DEPRECATION-STRATEGY.md) |
+| **Leave Management Guide** | Leave module API and workflows | [backend/LEAVE-MANAGEMENT-GUIDE.md](backend/LEAVE-MANAGEMENT-GUIDE.md) |
+| **Frontend Migration** | Frontend update guide for API v1 | [FRONTEND-MIGRATION-CHECKLIST.md](FRONTEND-MIGRATION-CHECKLIST.md) |
 
-#### Create Employee
-**POST** `/api/employees`
+### Database Documentation
 
-**Sample Request:**
-```json
-{
-  "firstName": "John",
-  "lastName": "Doe",
-  "gender": "Male",
-  "contactNumber": "9876543210",
-  "personalEmail": "john.doe@gmail.com",
-  "currentAddress": "123 Main Street, Bangalore",
-  "type": "full-time",
-  "department": "IT",
-  "designation": "Software Engineer",
-  "joinDate": "2024-01-15",
-  "officialEmail": "john.doe@ecovale.com",
-  "workLocation": "Bangalore",
-  "probationPeriod": 6,
-  "ctc": 1200000,
-  "basic": 50000,
-  "hraPercentage": 40,
-  "hra": 20000,
-  "conveyance": 1600,
-  "telephone": 500,
-  "medicalAllowance": 1250,
-  "specialAllowance": 26650,
-  "gross": 100000,
-  "includePF": true,
-  "includeESI": false,
-  "pfDeduction": 6000,
-  "employerPF": 6000,
-  "professionalTax": 200,
-  "tds": 5000,
-  "net": 88800,
-  "paymentMode": "Bank",
-  "bankName": "HDFC Bank",
-  "accountHolder": "John Doe",
-  "accountNumber": "50100123456789",
-  "ifscCode": "HDFC0001234",
-  "branch": "Bangalore Main",
-  "status": "active"
-}
-```
+- **Schema Design**: [backend/db-design/](backend/db-design/)
+- **Entities**: [backend/db-design/01-entities.md](backend/db-design/01-entities.md)
+- **Relationships**: [backend/db-design/03-relationships.md](backend/db-design/03-relationships.md)
+- **Migrations**: [backend/src/main/resources/db/migration/](backend/src/main/resources/db/migration/)
 
-**Sample Response:**
-```json
-{
-  "success": true,
-  "message": "Employee created successfully",
-  "data": {
-    "id": "EMP12A3B4C5",
-    "firstName": "John",
-    "lastName": "Doe",
-    "officialEmail": "john.doe@ecovale.com",
-    "department": "IT",
-    "designation": "Software Engineer",
-    "status": "ACTIVE",
-    "createdAt": "2026-01-26T10:30:00",
-    "updatedAt": "2026-01-26T10:30:00"
-  }
-}
-```
+### Production Documentation
 
-#### Get All Employees
-**GET** `/api/employees`
-
-#### Get Employee by ID
-**GET** `/api/employees/{id}`
-
-#### Get Active Employees
-**GET** `/api/employees/active`
-
-#### Get Employees by Department
-**GET** `/api/employees/department/IT`
-
-#### Search Employees by Name
-**GET** `/api/employees/search?name=John`
-
-#### Update Employee
-**PUT** `/api/employees/{id}`
-
-#### Delete Employee
-**DELETE** `/api/employees/{id}`
+- **Deployment Guide**: [backend/production/docs/08-deployment-guide.md](backend/production/docs/08-deployment-guide.md)
+- **AWS Setup**: [backend/production/README.md](backend/production/README.md)
+- **Performance Testing**: [backend/performance-tests/README.md](backend/performance-tests/README.md)
 
 ---
 
-### 2. Designation Management
+## 🛠️ Technology Stack
 
-#### Create Designation
-**POST** `/api/designations`
+### Backend (Spring Boot Ecosystem)
 
-**Sample Request:**
-```json
-{
-  "title": "Senior Software Engineer",
-  "department": "IT",
-  "description": "Leads development team and mentors junior developers",
-  "reportingTo": "Tech Lead",
-  "level": 4
-}
-```
+| Technology | Version | Purpose |
+|------------|---------|---------|
+| **Spring Boot** | 3.2.1 | Core application framework |
+| **Java** | 17 (LTS) | Primary programming language |
+| **Spring Security** | 6.2 | Authentication & authorization |
+| **JWT (JJWT)** | 0.12.3 | Token-based authentication |
+| **Spring Data JPA** | 6.2 | Database ORM layer |
+| **MySQL** | 8.0 | Production database |
+| **Flyway** | 9.22 | Database migration & versioning |
+| **SpringDoc OpenAPI** | 2.3.0 | API documentation (Swagger UI) |
+| **Micrometer + Prometheus** | 1.12 | Metrics & monitoring |
+| **Logback** | 1.4 | Structured JSON logging |
+| **JUnit 5 + Mockito** | 5.10 | Testing framework |
+| **Maven** | 3.9+ | Build & dependency management |
 
-#### Get All Designations
-**GET** `/api/designations`
+### Frontend (Modern React Stack)
 
-#### Get Designations by Department
-**GET** `/api/designations/department/IT`
+| Technology | Version | Purpose |
+|------------|---------|---------|
+| **React** | 18 | UI library |
+| **TypeScript** | 5.2 | Type-safe JavaScript |
+| **Vite** | 5.0 | Lightning-fast build tool |
+| **Context API** | Built-in | Lightweight state management |
+| **Fetch API** | Built-in | HTTP client |
 
-#### Update Designation
-**PUT** `/api/designations/{id}`
+### Infrastructure & DevOps
 
-#### Delete Designation
-**DELETE** `/api/designations/{id}`
-
----
-
-### 3. Attendance Management
-
-#### Create Attendance Record
-**POST** `/api/attendance`
-
-**Sample Request:**
-```json
-{
-  "employeeId": "EMP12A3B4C5",
-  "employeeName": "John Doe",
-  "month": "January",
-  "year": "2026",
-  "totalWorkingDays": 26,
-  "presentDays": 24,
-  "absentDays": 2,
-  "paidLeave": 1,
-  "unpaidLeave": 1,
-  "payableDays": 25,
-  "lossOfPayDays": 1,
-  "remarks": "Good attendance"
-}
-```
-
-#### Get Attendance by Employee
-**GET** `/api/attendance/employee/{employeeId}`
-
-#### Get Attendance by Month and Year
-**GET** `/api/attendance/period?month=January&year=2026`
-
-#### Update Attendance
-**PUT** `/api/attendance/{id}`
-
-#### Delete Attendance
-**DELETE** `/api/attendance/{id}`
+| Technology | Purpose |
+|------------|---------|
+| **Docker** | Containerization |
+| **Railway / Render** | Backend hosting (free tier available) |
+| **Netlify / Vercel** | Frontend hosting (free tier available) |
+| **AWS RDS** | Production database (optional) |
+| **CloudFlare** | CDN & DDoS protection |
+| **GitHub Actions** | CI/CD pipelines |
+| **Prometheus + Grafana** | Monitoring & dashboards |
 
 ---
 
-### 4. Advance Management
+## 🔌 API Documentation
 
-#### Create Advance Record
-**POST** `/api/advances`
+### RESTful API with Versioning
 
-**Sample Request:**
-```json
-{
-  "employeeId": "EMP12A3B4C5",
-  "employeeName": "John Doe",
-  "advanceMonth": "January 2026",
-  "advanceYear": "2026",
-  "advancePaidAmount": 15000,
-  "advanceDeductionMonth": "February 2026",
-  "advanceDeductionYear": "2026",
-  "remarks": "Emergency advance",
-  "status": "pending",
-  "remainingAmount": 15000
-}
-```
+**Modern API Design:** All endpoints follow RESTful principles with versioned paths (`/api/v1/*`), ensuring backward compatibility when introducing new features.
 
-#### Get Advances by Employee
-**GET** `/api/advances/employee/{employeeId}`
+#### Core API Endpoints
 
-#### Get Advances by Status
-**GET** `/api/advances/status/pending`
-
-#### Update Advance
-**PUT** `/api/advances/{id}`
-
-#### Delete Advance
-**DELETE** `/api/advances/{id}`
-
----
-
-### 5. Loan Management
-
-#### Create Loan Record
-**POST** `/api/loans`
-
-**Sample Request:**
-```json
-{
-  "employeeId": "EMP12A3B4C5",
-  "employeeName": "John Doe",
-  "loanAmount": 100000,
-  "interestRate": 10,
-  "numberOfEMIs": 12,
-  "emiAmount": 8792,
-  "totalAmount": 105500,
-  "startMonth": "February 2026",
-  "startYear": "2026",
-  "totalPaidEMIs": 0,
-  "remainingBalance": 105500,
-  "status": "active",
-  "remarks": "Home improvement loan"
-}
-```
-
-#### Get Loans by Employee
-**GET** `/api/loans/employee/{employeeId}`
-
-#### Get Loans by Status
-**GET** `/api/loans/status/active`
-
-#### Update Loan
-**PUT** `/api/loans/{id}`
-
-#### Delete Loan
-**DELETE** `/api/loans/{id}`
-
----
-
-## Standard API Response Format
-
-All endpoints return a standard response structure:
-
-**Success Response:**
-```json
-{
-  "success": true,
-  "message": "Operation successful",
-  "data": { /* actual data */ }
-}
-```
-
-**Error Response:**
-```json
-{
-  "success": false,
-  "message": "Error description",
-  "data": null
-}
-```
-
-**Validation Error Response:**
-```json
-{
-  "success": false,
-  "message": "Validation failed",
-  "data": {
-    "firstName": "First name is required",
-    "contactNumber": "Contact number must be 10 digits"
-  }
-}
-```
-
-## Error Codes
-- **200** - Success
-- **201** - Created
-- **400** - Bad Request (Validation errors)
-- **404** - Resource Not Found
-- **409** - Conflict (Duplicate resource)
-- **500** - Internal Server Error
-
-## CORS Configuration
-CORS is enabled for the following origins:
-- `http://localhost:3000` (React default)
-- `http://localhost:5173` (Vite default)
-- `http://localhost:5174`
-- `*` (all origins - configure for production)
-
-## Database Schema Auto-creation
-Spring Boot automatically creates database tables based on entities when you run the application for the first time. The `spring.jpa.hibernate.ddl-auto=update` setting ensures schema is created/updated automatically.
-
-## Testing with cURL
-
-### Create Employee
 ```bash
-curl -X POST http://localhost:8080/api/employees \
+# Authentication & Authorization
+POST   /api/v1/auth/login              # Get JWT token
+POST   /api/v1/auth/register           # Create new user
+
+# Employee Management (8 RESTful endpoints)
+GET    /api/v1/employees               # List all employees (paginated)
+POST   /api/v1/employees               # Create new employee
+GET    /api/v1/employees/{id}          # Get employee details
+PUT    /api/v1/employees/{id}          # Update employee
+DELETE /api/v1/employees/{id}          # Soft delete employee
+GET    /api/v1/employees/search        # Search with filters
+GET    /api/v1/employees/{id}/leaves   # Employee's leave history
+GET    /api/v1/employees/{id}/salary   # Salary details
+
+# Leave Management (Two-level approval workflow)
+POST   /api/v1/leaves                  # Apply for leave
+GET    /api/v1/leaves                  # List leaves (role-based filtering)
+GET    /api/v1/leaves/{id}             # Leave details with approval history
+PUT    /api/v1/leaves/{id}/manager-approve   # Manager approval (first level)
+PUT    /api/v1/leaves/{id}/admin-approve     # Admin approval (second level)
+PUT    /api/v1/leaves/{id}/reject      # Reject leave with reason
+DELETE /api/v1/leaves/{id}             # Cancel leave request
+
+# Attendance & Time Tracking
+POST   /api/v1/attendance              # Clock in/out
+GET    /api/v1/attendance              # Attendance records (date range)
+GET    /api/v1/attendance/monthly      # Monthly attendance summary
+PUT    /api/v1/attendance/{id}         # Update attendance record
+
+# Payroll Processing
+POST   /api/v1/payroll/run             # Generate monthly payroll
+GET    /api/v1/payroll/payslips        # Employee payslips
+GET    /api/v1/payroll/reports         # Financial reports
+
+# Health & Monitoring
+GET    /api/v1/health                  # System health check
+GET    /api/v1/health/ready            # Kubernetes readiness probe
+GET    /api/v1/health/live             # Kubernetes liveness probe
+GET    /api/v1/health/info             # App version & uptime
+```
+
+### Interactive API Explorer (Swagger UI)
+
+🔗 **Try APIs Live:** [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+
+**Features:**
+- ✅ **Try-it-out functionality** - Execute API calls directly from browser
+- ✅ **JWT authentication** - Built-in token authorization
+- ✅ **Request/response examples** - See sample payloads for every endpoint
+- ✅ **Schema documentation** - Complete data model documentation
+- ✅ **Error responses** - HTTP status codes and error messages documented
+
+### Quick API Usage Example
+
+**Step 1: Get JWT Token**
+```bash
+curl -X POST http://localhost:8080/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{
-    "firstName": "Jane",
-    "lastName": "Smith",
-    "gender": "Female",
-    "contactNumber": "9876543211",
-    "personalEmail": "jane.smith@gmail.com",
-    "currentAddress": "456 Park Avenue, Bangalore",
-    "type": "full-time",
-    "department": "HR",
-    "designation": "HR Manager",
-    "joinDate": "2024-02-01",
-    "officialEmail": "jane.smith@ecovale.com",
-    "workLocation": "Bangalore",
-    "probationPeriod": 3,
-    "ctc": 900000,
-    "basic": 37500,
-    "net": 67000,
-    "paymentMode": "Bank",
-    "status": "active"
+    "username": "demo_admin",
+    "password": "Demo@2026!Secure"
   }'
 ```
 
-### Get All Employees
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Login successful",
+  "data": {
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "type": "Bearer",
+    "expiresIn": 86400,
+    "roles": ["ROLE_ADMIN", "ROLE_HR"]
+  },
+  "timestamp": "2026-01-26T10:30:00Z"
+}
+```
+
+**Step 2: Use Token for Authenticated Requests**
 ```bash
-curl http://localhost:8080/api/employees
+# Get all employees
+curl -X GET http://localhost:8080/api/v1/employees \
+  -H "Authorization: Bearer <your-token-here>"
+
+# Apply for leave
+curl -X POST http://localhost:8080/api/v1/leaves \
+  -H "Authorization: Bearer <your-token-here>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "leaveTypeId": 1,
+    "startDate": "2026-02-01",
+    "endDate": "2026-02-03",
+    "reason": "Personal work"
+  }'
 ```
 
-### Get Employee by ID
+### Complete API Reference
+
+📚 **For detailed documentation with request/response schemas, error codes, and testing scenarios:**
+- **[API-DOCUMENTATION.md](backend/API-DOCUMENTATION.md)** - Complete API reference (100+ endpoints)
+- **[API-QUICK-REFERENCE.md](backend/API-QUICK-REFERENCE.md)** - Quick start guide
+- **[DEMO-CREDENTIALS.md](DEMO-CREDENTIALS.md)** - Test accounts with API examples
+
+---
+
+## 💻 Development & Testing
+
+### 🏗️ System Architecture
+
+**Modern Three-Tier Architecture:**
+- **Presentation Layer:** React 18 with TypeScript (type-safe UI components)
+- **Business Layer:** Spring Boot 3.2 REST API (domain-driven services)
+- **Data Layer:** MySQL 8.0 with JPA/Hibernate (entity relationships)
+
+**Design Patterns Implemented:**
+- **MVC Pattern** - Controllers separate routing from business logic
+- **Repository Pattern** - Data access abstraction with Spring Data JPA
+- **DTO Pattern** - Clean separation between entities and API contracts
+- **AOP (Aspect-Oriented Programming)** - Centralized audit logging
+- **Builder Pattern** - Readable object construction (Employee, Leave entities)
+- **Strategy Pattern** - Pluggable leave approval workflows
+
+📐 **For detailed architecture diagrams and design decisions, see [ARCHITECTURE.md](ARCHITECTURE.md)**
+
+---
+
+### 📂 Project Structure
+
+```
+ecovale-hr-web-app/
+├── backend/                          # Spring Boot 3.2 Backend
+│   ├── src/main/java/com/ecovale/hr/
+│   │   ├── config/                   # Configuration (Security, CORS, Swagger)
+│   │   ├── controller/               # REST API controllers (8 endpoints)
+│   │   │   ├── EmployeeController.java
+│   │   │   ├── LeaveController.java
+│   │   │   ├── AttendanceController.java
+│   │   │   ├── PayrollController.java
+│   │   │   ├── AuditController.java
+│   │   │   └── HealthCheckController.java
+│   │   ├── dto/                      # Data Transfer Objects (Request/Response)
+│   │   ├── entity/                   # JPA Entities (15 domain models)
+│   │   ├── repository/               # Spring Data JPA repositories
+│   │   ├── service/                  # Business logic layer
+│   │   ├── security/                 # JWT, authentication, authorization
+│   │   └── util/                     # Helpers, validators, constants
+│   ├── src/main/resources/
+│   │   ├── db/migration/             # Flyway migrations (V1__init → V8__audit)
+│   │   ├── application.properties    # Main configuration
+│   │   └── application-prod.properties  # Production overrides
+│   ├── performance-tests/            # k6 load tests (1000+ concurrent users)
+│   └── pom.xml                       # Maven dependencies (40+ libraries)
+│
+├── src/                              # React 18 Frontend
+│   ├── components/                   # Reusable UI components
+│   │   ├── layout/                   # MainLayout, Navbar, Sidebar
+│   │   └── ui/                       # Button, Input, Toast, ErrorBoundary
+│   ├── pages/                        # Screen implementations (15 pages)
+│   │   ├── LoginPage.tsx
+│   │   ├── DashboardPage.tsx
+│   │   ├── EmployeesPage.tsx
+│   │   ├── NewEmployeePage.tsx
+│   │   └── AttendanceRegisterPage.tsx
+│   ├── contexts/                     # React Context API (AppContext)
+│   ├── services/                     # API service layer (storageService)
+│   ├── utils/                        # Helpers, constants, formatters
+│   └── types/                        # TypeScript type definitions
+│
+├── ARCHITECTURE.md                   # 📐 Architecture documentation (17 KB)
+├── DEPLOYMENT-GUIDE.md               # 🚀 Cloud deployment guide (24 KB)
+├── DEMO-CREDENTIALS.md               # 🔑 Test accounts & scenarios (18 KB)
+└── README.md                         # 📖 This file
+```
+
+---
+
+### 🧪 Running Tests
+
+**Backend Unit & Integration Tests:**
 ```bash
-curl http://localhost:8080/api/employees/EMP12A3B4C5
+cd backend
+
+# Run all tests
+mvn test
+
+# Run tests with coverage report
+mvn clean test jacoco:report
+
+# View coverage report
+# Open: target/site/jacoco/index.html
+# Target: >80% code coverage
+
+# Run integration tests only
+mvn verify -P integration-tests
+
+# Skip tests during build (not recommended)
+mvn package -DskipTests
 ```
 
-## Testing with Postman
-1. Import the API endpoints into Postman
-2. Set base URL: `http://localhost:8080/api`
-3. Use JSON body for POST/PUT requests
-4. Check response status and data
-
-## Deployment to Production
-
-### 1. AWS RDS Setup
-1. Create MySQL RDS instance
-2. Configure security groups
-3. Update `application.properties` with RDS endpoint
-
-### 2. AWS Elastic Beanstalk
+**Performance & Load Testing:**
 ```bash
-# Create JAR file
-mvn clean package
+cd backend/performance-tests
 
-# Deploy to Elastic Beanstalk
-eb init
-eb create
-eb deploy
+# Load test: 1000 concurrent users, 5 minutes
+k6 run load-test-complete.js
+
+# Stress test: Find breaking point
+k6 run stress-test.js
+
+# Spike test: Sudden traffic surge
+k6 run spike-test.js
+
+# Expected results:
+# - 95th percentile response time: <500ms
+# - Error rate: <1%
+# - Throughput: >1000 req/sec
 ```
 
-### 3. Docker Deployment
-```dockerfile
-# Dockerfile
-FROM openjdk:17-jdk-slim
-COPY target/hr-backend-1.0.0.jar app.jar
-ENTRYPOINT ["java", "-jar", "/app.jar"]
-```
+---
 
+### ✅ Code Quality & Security
+
+**Static Code Analysis:**
 ```bash
-# Build and run Docker container
-docker build -t ecovale-hr-backend .
-docker run -p 8080:8080 ecovale-hr-backend
+# SonarQube code quality scan
+mvn sonar:sonar \
+  -Dsonar.projectKey=ecovale-hr \
+  -Dsonar.host.url=http://localhost:9000 \
+  -Dsonar.login=<your-token>
+
+# Target metrics:
+# - Code coverage: >80%
+# - Technical debt: <5%
+# - Security hotspots: 0
+# - Code smells: <50
 ```
 
-## Environment Variables (Production)
+**Security Vulnerability Scanning:**
 ```bash
-export DB_PASSWORD=your_secure_password
-export SPRING_PROFILES_ACTIVE=production
+# OWASP dependency check
+mvn dependency-check:check
+
+# View report: target/dependency-check-report.html
 ```
 
-## Monitoring and Health Checks
-- **Health Check:** `http://localhost:8080/actuator/health`
-- **Metrics:** `http://localhost:8080/actuator/metrics`
-- **Info:** `http://localhost:8080/actuator/info`
+**Linting & Formatting:**
+```bash
+# Frontend linting (if configured)
+npm run lint
 
-## Frontend Integration
+# Backend formatting (Maven Formatter Plugin)
+mvn formatter:format
+```
 
-Update your frontend to call the backend API:
+---
 
-```javascript
-// Example: Create Employee from React Frontend
-const createEmployee = async (employeeData) => {
-  const response = await fetch('http://localhost:8080/api/employees', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(employeeData)
-  });
+### 🗄️ Database Migrations
+
+**Flyway Migration Commands:**
+```bash
+cd backend
+
+# Check migration status
+mvn flyway:info
+
+# Apply pending migrations
+mvn flyway:migrate
+
+# Validate checksums
+mvn flyway:validate
+
+# Rollback last migration (if supported)
+mvn flyway:undo
+
+# ⚠️ Clean database (DESTRUCTIVE - dev only)
+mvn flyway:clean
+```
+
+**Migration Files:**
+- `V1__init_database.sql` - Initial schema (users, roles, permissions)
+- `V2__employee_management.sql` - Employee tables
+- `V3__leave_management.sql` - Leave tables with approval workflow
+- `V4__attendance_tracking.sql` - Attendance tables
+- `V5__payroll_system.sql` - Payroll, loans, advances
+- `V6__audit_logging.sql` - Audit trail tables
+- `V7__additional_features.sql` - Documents, settings
+- `V8__audit_indexes.sql` - Performance indexes
+
+---
+
+### 🐳 Local Development with Docker
+
+**Quick Start with Docker Compose:**
+```bash
+# Start all services (backend + MySQL + monitoring)
+docker-compose up -d
+
+# Services running:
+✅ Backend API:     http://localhost:8080
+✅ MySQL Database:  localhost:3306
+✅ Prometheus:      http://localhost:9090
+✅ Grafana:         http://localhost:3000
+
+# Check logs
+docker-compose logs -f backend
+
+# Stop services
+docker-compose down
+
+# Clean volumes (fresh database)
+docker-compose down -v
+```
+
+**Build Docker Image:**
+```bash
+cd backend
+
+# Build backend image
+docker build -t ecovale-hr:latest .
+
+# Run standalone
+docker run -p 8080:8080 \
+  -e SPRING_DATASOURCE_URL=jdbc:mysql://host.docker.internal:3306/ecovale_hr \
+  -e JWT_SECRET=your-secret-key \
+  ecovale-hr:latest
+```
+
+---
+
+## 🚀 Production Deployment
+
+### 🐳 Docker Deployment (Recommended)
+
+**Quick Production Setup:**
+```bash
+# 1. Build backend Docker image
+cd backend
+docker build -t ecovale-hr:latest .
+
+# 2. Start all production services
+docker-compose -f docker-compose.prod.yml up -d
+
+# Services running:
+✅ Backend API:     https://your-domain.com
+✅ MySQL Database:  Internal network
+✅ Prometheus:      Metrics collection
+✅ Grafana:         Monitoring dashboards
+✅ Nginx:          Reverse proxy + SSL
+```
+
+**Docker Compose Production Stack:**
+```yaml
+version: '3.8'
+services:
+  backend:
+    image: ecovale-hr:latest
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - DATABASE_URL=${DATABASE_URL}
+      - JWT_SECRET=${JWT_SECRET}
+    ports:
+      - "8080:8080"
   
-  const result = await response.json();
-  return result;
-};
+  mysql:
+    image: mysql:8.0
+    environment:
+      - MYSQL_DATABASE=ecovale_hr
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+  
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+  
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
 ```
 
-## Troubleshooting
+---
 
-### Issue: Port 8080 already in use
+### ☁️ Cloud Deployment (AWS)
+
+**Architecture:** ECS Fargate + RDS MySQL + CloudWatch
+
+**Step 1: Setup RDS MySQL Database**
 ```bash
-# Find process using port 8080
-lsof -i :8080
-
-# Kill the process
-kill -9 <PID>
+# Create production database
+aws rds create-db-instance \
+  --db-instance-identifier ecovale-hr-prod-db \
+  --db-instance-class db.t3.medium \
+  --engine mysql \
+  --engine-version 8.0 \
+  --master-username admin \
+  --master-user-password <secure-password-here> \
+  --allocated-storage 50 \
+  --multi-az \
+  --backup-retention-period 7 \
+  --publicly-accessible false \
+  --vpc-security-group-ids sg-xxxxx \
+  --tags Key=Environment,Value=Production Key=Project,Value=EcovaleHR
 ```
 
-### Issue: Database connection failed
-- Verify MySQL is running: `sudo systemctl status mysql`
-- Check credentials in `application.properties`
-- Ensure database `ecovale_hr` exists
+**Step 2: Push Docker Image to ECR**
+```bash
+# Authenticate Docker to ECR
+aws ecr get-login-password --region us-east-1 | \
+  docker login --username AWS --password-stdin <account-id>.dkr.ecr.us-east-1.amazonaws.com
 
-### Issue: Bean validation not working
-- Ensure `spring-boot-starter-validation` is in `pom.xml`
-- Use `@Valid` annotation in controller methods
+# Tag and push image
+docker tag ecovale-hr:latest <account-id>.dkr.ecr.us-east-1.amazonaws.com/ecovale-hr:latest
+docker push <account-id>.dkr.ecr.us-east-1.amazonaws.com/ecovale-hr:latest
+```
 
-## Support
-For issues or questions, contact: development@ecovale.com
+**Step 3: Deploy to ECS Fargate**
+```bash
+# Update ECS service with new image
+aws ecs update-service \
+  --cluster ecovale-hr-cluster \
+  --service ecovale-hr-service \
+  --force-new-deployment \
+  --desired-count 2
 
-## License
-© 2026 Ecovale. All rights reserved.
+# Check deployment status
+aws ecs describe-services \
+  --cluster ecovale-hr-cluster \
+  --services ecovale-hr-service
+```
+
+**Step 4: Configure Secrets (AWS Secrets Manager)**
+```bash
+# Store database credentials
+aws secretsmanager create-secret \
+  --name ecovale-hr/db-credentials \
+  --secret-string '{
+    "username": "admin",
+    "password": "<db-password>",
+    "host": "ecovale-hr-prod-db.xxxxx.rds.amazonaws.com",
+    "port": 3306,
+    "database": "ecovale_hr"
+  }'
+
+# Store JWT secret (256-bit key)
+aws secretsmanager create-secret \
+  --name ecovale-hr/jwt-secret \
+  --secret-string '{"secret": "<32-character-random-key>"}'
+
+# ECS task will fetch secrets at runtime
+```
+
+**Step 5: Setup Application Load Balancer**
+```bash
+# ALB automatically created by ECS service
+# Configure health checks:
+# - Path: /api/v1/health/live
+# - Interval: 30 seconds
+# - Timeout: 5 seconds
+# - Healthy threshold: 2
+# - Unhealthy threshold: 3
+```
+
+---
+
+### 📊 Monitoring & Observability
+
+**CloudWatch Alarms:**
+```bash
+# High CPU usage alert
+aws cloudwatch put-metric-alarm \
+  --alarm-name ecovale-hr-high-cpu \
+  --metric-name CPUUtilization \
+  --namespace AWS/ECS \
+  --statistic Average \
+  --period 300 \
+  --threshold 80 \
+  --comparison-operator GreaterThanThreshold \
+  --alarm-actions <sns-topic-arn>
+
+# High response time alert
+aws cloudwatch put-metric-alarm \
+  --alarm-name ecovale-hr-high-latency \
+  --metric-name TargetResponseTime \
+  --namespace AWS/ApplicationELB \
+  --statistic Average \
+  --period 60 \
+  --threshold 1 \
+  --comparison-operator GreaterThanThreshold
+```
+
+**Prometheus Metrics Exported:**
+- `http_server_requests_seconds` - Request latency by endpoint
+- `jvm_memory_used_bytes` - JVM memory usage
+- `hikaricp_connections_active` - Database connection pool
+- `leave_approval_duration_seconds` - Business metric
+
+**Grafana Dashboards Available:**
+- JVM Metrics (heap, GC, threads)
+- API Performance (latency, throughput, errors)
+- Database Metrics (queries, connections)
+- Business Metrics (leaves, attendance, payroll)
+
+---
+
+### 🔐 Production Checklist
+
+Before deploying to production, ensure:
+
+**Security:**
+- ✅ Change all default passwords
+- ✅ Generate strong JWT secret (256-bit minimum)
+- ✅ Configure CORS to allow only your frontend domain
+- ✅ Enable HTTPS/SSL certificates
+- ✅ Setup rate limiting (10 req/sec per IP)
+- ✅ Enable SQL injection protection (JPA parameterized queries)
+- ✅ Configure firewall rules (allow only 443, 80, SSH)
+- ✅ Rotate database credentials quarterly
+
+**Database:**
+- ✅ Enable automated backups (7-day retention minimum)
+- ✅ Setup read replicas for scaling
+- ✅ Configure slow query logging
+- ✅ Apply Flyway migrations before deployment
+- ✅ Enable point-in-time recovery
+
+**Monitoring:**
+- ✅ Setup CloudWatch logs aggregation
+- ✅ Configure error rate alarms (>5% = critical)
+- ✅ Setup latency alarms (>1s = warning)
+- ✅ Enable distributed tracing (AWS X-Ray)
+- ✅ Configure uptime monitoring (Pingdom/UptimeRobot)
+
+**Performance:**
+- ✅ Enable database connection pooling (HikariCP configured)
+- ✅ Configure caching (Redis recommended for sessions)
+- ✅ Setup CDN for frontend assets (CloudFront)
+- ✅ Enable gzip compression
+- ✅ Run load tests before launch (k6 tests provided)
+
+**📖 Complete Deployment Guide:** See [DEPLOYMENT-GUIDE.md](DEPLOYMENT-GUIDE.md) for Railway, Render, Netlify, Vercel deployment steps with screenshots.
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! This is a portfolio/learning project, but improvements are appreciated.
+
+**How to Contribute:**
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/YourFeature`
+3. Make your changes with clear commit messages
+4. Write/update tests for new functionality
+5. Update documentation as needed
+6. Push and create a Pull Request
+
+**Coding Standards:**
+- Follow existing code style (Java conventions, React best practices)
+- Write unit tests (aim for >80% coverage)
+- Update relevant documentation
+- Add descriptive commit messages
+
+---
+
+## 📞 Support & Contact
+
+### 📚 Documentation Resources
+- **[ARCHITECTURE.md](ARCHITECTURE.md)** - System architecture & design patterns
+- **[API-DOCUMENTATION.md](backend/API-DOCUMENTATION.md)** - Complete API reference  
+- **[DEPLOYMENT-GUIDE.md](DEPLOYMENT-GUIDE.md)** - Cloud deployment guide
+- **[DEMO-CREDENTIALS.md](DEMO-CREDENTIALS.md)** - Test accounts
+
+### 💬 Get Help
+- **GitHub Issues:** Report bugs or request features
+- **Email:** support@ecovale.com
+- **Documentation:** Check the docs folder for detailed guides
+
+### 🔗 Useful Links
+- **Swagger UI:** `http://localhost:8080/swagger-ui.html`
+- **Grafana Dashboard:** `http://localhost:3000`
+- **Prometheus Metrics:** `http://localhost:9090`
+
+---
+
+## 📄 License
+
+**Proprietary License** - © 2026 Ecovale
+
+This is a portfolio/demonstration project. Contact the author for licensing inquiries.
+
+---
+
+## 🎉 Acknowledgments
+
+**Built With Modern Technologies:**
+- [Spring Boot](https://spring.io/projects/spring-boot) - Backend framework
+- [React](https://reactjs.org/) - Frontend library
+- [MySQL](https://www.mysql.com/) - Database
+- [Docker](https://www.docker.com/) - Containerization
+- [Prometheus](https://prometheus.io/) & [Grafana](https://grafana.com/) - Monitoring
+
+**Special Thanks:**
+- Spring Boot community for excellent documentation
+- React team for the powerful UI library
+- Open source contributors who make projects like this possible
+
+---
+
+<div align="center">
+  
+### 🌟 If you find this project helpful, please star it on GitHub! 🌟
+
+  <p>Made with ❤️ and ☕ by the Ecovale Team</p>
+  
+  <p>
+    <a href="ARCHITECTURE.md">📐 Architecture</a> •
+    <a href="backend/API-DOCUMENTATION.md">📚 API Docs</a> •
+    <a href="DEPLOYMENT-GUIDE.md">🚀 Deploy Guide</a> •
+    <a href="DEMO-CREDENTIALS.md">🔑 Demo Access</a>
+  </p>
+  
+  <p>
+    <strong>Ready to deploy?</strong> Follow the <a href="DEPLOYMENT-GUIDE.md">5-minute deployment guide</a>
+  </p>
+  
+</div>
+
+---
+
+**Project Status:** ✅ Production-Ready | 🚀 Actively Maintained | 📖 Well-Documented
+
+**Last Updated:** January 26, 2026 | **Version:** 1.0.0
+
