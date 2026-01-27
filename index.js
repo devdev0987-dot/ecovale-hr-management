@@ -3,91 +3,126 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.createConfigItem = createConfigItem;
-exports.createConfigItemAsync = createConfigItemAsync;
-exports.createConfigItemSync = createConfigItemSync;
-Object.defineProperty(exports, "default", {
-  enumerable: true,
-  get: function () {
-    return _full.default;
-  }
+var _templateLiterals = require("./template-literals.js");
+Object.keys(_templateLiterals).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _templateLiterals[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function () {
+      return _templateLiterals[key];
+    }
+  });
 });
-exports.loadOptions = loadOptions;
-exports.loadOptionsAsync = loadOptionsAsync;
-exports.loadOptionsSync = loadOptionsSync;
-exports.loadPartialConfig = loadPartialConfig;
-exports.loadPartialConfigAsync = loadPartialConfigAsync;
-exports.loadPartialConfigSync = loadPartialConfigSync;
-function _gensync() {
-  const data = require("gensync");
-  _gensync = function () {
-    return data;
-  };
-  return data;
-}
-var _full = require("./full.js");
-var _partial = require("./partial.js");
-var _item = require("./item.js");
-var _rewriteStackTrace = require("../errors/rewrite-stack-trace.js");
-const loadPartialConfigRunner = _gensync()(_partial.loadPartialConfig);
-function loadPartialConfigAsync(...args) {
-  return (0, _rewriteStackTrace.beginHiddenCallStack)(loadPartialConfigRunner.async)(...args);
-}
-function loadPartialConfigSync(...args) {
-  return (0, _rewriteStackTrace.beginHiddenCallStack)(loadPartialConfigRunner.sync)(...args);
-}
-function loadPartialConfig(opts, callback) {
-  if (callback !== undefined) {
-    (0, _rewriteStackTrace.beginHiddenCallStack)(loadPartialConfigRunner.errback)(opts, callback);
-  } else if (typeof opts === "function") {
-    (0, _rewriteStackTrace.beginHiddenCallStack)(loadPartialConfigRunner.errback)(undefined, opts);
-  } else {
-    {
-      return loadPartialConfigSync(opts);
+var _expressions = require("./expressions.js");
+Object.keys(_expressions).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _expressions[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function () {
+      return _expressions[key];
     }
-  }
-}
-function* loadOptionsImpl(opts) {
-  var _config$options;
-  const config = yield* (0, _full.default)(opts);
-  return (_config$options = config == null ? void 0 : config.options) != null ? _config$options : null;
-}
-const loadOptionsRunner = _gensync()(loadOptionsImpl);
-function loadOptionsAsync(...args) {
-  return (0, _rewriteStackTrace.beginHiddenCallStack)(loadOptionsRunner.async)(...args);
-}
-function loadOptionsSync(...args) {
-  return (0, _rewriteStackTrace.beginHiddenCallStack)(loadOptionsRunner.sync)(...args);
-}
-function loadOptions(opts, callback) {
-  if (callback !== undefined) {
-    (0, _rewriteStackTrace.beginHiddenCallStack)(loadOptionsRunner.errback)(opts, callback);
-  } else if (typeof opts === "function") {
-    (0, _rewriteStackTrace.beginHiddenCallStack)(loadOptionsRunner.errback)(undefined, opts);
-  } else {
-    {
-      return loadOptionsSync(opts);
+  });
+});
+var _statements = require("./statements.js");
+Object.keys(_statements).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _statements[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function () {
+      return _statements[key];
     }
-  }
-}
-const createConfigItemRunner = _gensync()(_item.createConfigItem);
-function createConfigItemAsync(...args) {
-  return (0, _rewriteStackTrace.beginHiddenCallStack)(createConfigItemRunner.async)(...args);
-}
-function createConfigItemSync(...args) {
-  return (0, _rewriteStackTrace.beginHiddenCallStack)(createConfigItemRunner.sync)(...args);
-}
-function createConfigItem(target, options, callback) {
-  if (callback !== undefined) {
-    (0, _rewriteStackTrace.beginHiddenCallStack)(createConfigItemRunner.errback)(target, options, callback);
-  } else if (typeof options === "function") {
-    (0, _rewriteStackTrace.beginHiddenCallStack)(createConfigItemRunner.errback)(target, undefined, callback);
-  } else {
-    {
-      return createConfigItemSync(target, options);
+  });
+});
+var _classes = require("./classes.js");
+Object.keys(_classes).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _classes[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function () {
+      return _classes[key];
     }
-  }
-}
-0 && 0;
+  });
+});
+var _methods = require("./methods.js");
+Object.keys(_methods).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _methods[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function () {
+      return _methods[key];
+    }
+  });
+});
+var _modules = require("./modules.js");
+Object.keys(_modules).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _modules[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function () {
+      return _modules[key];
+    }
+  });
+});
+var _types = require("./types.js");
+Object.keys(_types).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _types[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function () {
+      return _types[key];
+    }
+  });
+});
+var _flow = require("./flow.js");
+Object.keys(_flow).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _flow[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function () {
+      return _flow[key];
+    }
+  });
+});
+var _base = require("./base.js");
+Object.keys(_base).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _base[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function () {
+      return _base[key];
+    }
+  });
+});
+var _jsx = require("./jsx.js");
+Object.keys(_jsx).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _jsx[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function () {
+      return _jsx[key];
+    }
+  });
+});
+var _typescript = require("./typescript.js");
+Object.keys(_typescript).forEach(function (key) {
+  if (key === "default" || key === "__esModule") return;
+  if (key in exports && exports[key] === _typescript[key]) return;
+  Object.defineProperty(exports, key, {
+    enumerable: true,
+    get: function () {
+      return _typescript[key];
+    }
+  });
+});
 
 //# sourceMappingURL=index.js.map
