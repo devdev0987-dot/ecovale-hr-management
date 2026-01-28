@@ -5,14 +5,21 @@ import MainLayout from './components/layout/MainLayout';
 import { AppContextProvider } from './contexts/AppContext';
 
 const App: React.FC = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  // Check localStorage for existing auth on mount
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    return localStorage.getItem('isAuthenticated') === 'true';
+  });
 
   const handleLogin = () => {
     setIsAuthenticated(true);
+    localStorage.setItem('isAuthenticated', 'true');
   };
 
   const handleLogout = () => {
     setIsAuthenticated(false);
+    localStorage.removeItem('isAuthenticated');
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('auth_user');
   };
 
   return (
