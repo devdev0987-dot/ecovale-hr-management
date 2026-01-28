@@ -124,7 +124,7 @@ const DashboardPage: React.FC = () => {
           <QuickActionButton icon={<UserPlus size={32} className="text-green-600" />} label="Add Employee" page="new-employee" />
           <QuickActionButton icon={<FileText size={32} className="text-indigo-600" />} label="Generate Letter" page="letters" />
           <QuickActionButton icon={<Banknote size={32} className="text-yellow-600" />} label="Process Payroll" page="payroll" />
-          <QuickActionButton icon={<Calculator size={32} className="text-purple-600" />} label="Calculate ESI/PF" page="calculator" />
+          <QuickActionButton icon={<Calculator size={32} className="text-purple-600" />} label="ESI & PF" page="calculator" />
         </div>
       </div>
 

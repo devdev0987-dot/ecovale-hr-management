@@ -28,7 +28,7 @@ const menuItems = [
   { icon: DollarSign, label: 'Advance Register', page: 'advance-register', requiredRoles: ['ROLE_ADMIN'] }, // Admin only
   { icon: CreditCard, label: 'Loan Register', page: 'loan-register', requiredRoles: ['ROLE_ADMIN'] }, // Admin only
   { icon: PlayCircle, label: 'Pay Run', page: 'pay-run', requiredRoles: ['ROLE_ADMIN'] }, // Admin only
-  { icon: Calculator, label: 'ESI/PF Calculator', page: 'calculator', requiredRoles: ['ROLE_USER', 'ROLE_ADMIN'] },
+  { icon: Calculator, label: 'ESI & PF', page: 'calculator', requiredRoles: ['ROLE_USER', 'ROLE_ADMIN'] },
   { icon: TrendingUp, label: 'Career Management', page: 'career', requiredRoles: ['ROLE_USER', 'ROLE_ADMIN'] },
   { icon: Settings, label: 'Settings', page: 'settings', requiredRoles: ['ROLE_ADMIN'] }, // Admin only
 ];
