@@ -4,10 +4,9 @@ on:
   push:
     branches:
       - main
-      - copilot/fix-blank-page-issue
     paths:
-      - '*.tsx'
-      - '*.ts'
+      - '**/*.tsx'
+      - '**/*.ts'
       - '*.html'
       - 'components/**'
       - 'pages/**'
@@ -56,9 +55,7 @@ jobs:
       - name: Cache dependencies
         uses: actions/cache@v4
         with:
-          path: |
-            ~/.npm
-            node_modules
+          path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
@@ -75,8 +72,13 @@ jobs:
         run: |
           echo "Build completed successfully"
           ls -lah dist/
-          echo "index.html contents:"
-          cat dist/index.html
+          echo "Verifying index.html exists and is not empty"
+          if [ -s dist/index.html ]; then
+            echo "✅ index.html is present and contains content"
+          else
+            echo "❌ index.html is missing or empty"
+            exit 1
+          fi
       
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -102,7 +104,7 @@ jobs:
     name: Deploy to Netlify
     runs-on: ubuntu-latest
     needs: build
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/copilot/fix-blank-page-issue')
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     environment:
       name: netlify-production
       url: ${{ steps.deploy.outputs.url }}
@@ -152,16 +154,29 @@ jobs:
     name: Deployment Health Check
     runs-on: ubuntu-latest
     needs: deploy-netlify
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/copilot/fix-blank-page-issue')
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     
     steps:
       - name: Wait for deployment
-        run: sleep 30
-      
-      - name: Check deployment health
         run: |
-          echo "Deployment health check completed"
-          echo "Note: Configure DEPLOYMENT_URL secret to enable actual health checks"
+          echo "Waiting for deployment to stabilize..."
+          sleep 10
+          echo "Note: Configure DEPLOYMENT_URL for automated health checks"
+      
+      - name: Verify deployment (if URL configured)
+        if: env.DEPLOYMENT_URL != ''
+        run: |
+          echo "Checking deployment at: $DEPLOYMENT_URL"
+          for i in {1..10}; do
+            if curl -f -s -o /dev/null "$DEPLOYMENT_URL"; then
+              echo "✅ Deployment is accessible"
+              exit 0
+            fi
+            echo "Attempt $i failed, waiting 5 seconds..."
+            sleep 5
+          done
+          echo "❌ Deployment health check failed"
+          exit 1
       
       - name: Notify success
         if: success()
@@ -190,3 +205,4 @@ jobs:
           echo "The deployment process encountered an error." >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "Please check the workflow logs for details." >> $GITHUB_STEP_SUMMARY
+

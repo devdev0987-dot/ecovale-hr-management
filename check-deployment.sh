@@ -35,7 +35,8 @@ fi
 
 echo ""
 echo "🔨 Step 2: Testing build process..."
-if npm run build > /tmp/build.log 2>&1; then
+BUILD_LOG=$(mktemp)
+if npm run build > "$BUILD_LOG" 2>&1; then
     echo -e "${GREEN}✅ Build successful${NC}"
     if [ -d "dist" ] && [ -f "dist/index.html" ]; then
         echo -e "${GREEN}✅ dist/index.html generated${NC}"
@@ -47,9 +48,10 @@ if npm run build > /tmp/build.log 2>&1; then
     fi
 else
     echo -e "${RED}❌ Build failed${NC}"
-    echo "   Check /tmp/build.log for details"
-    tail -20 /tmp/build.log
+    echo "   Check log for details:"
+    tail -20 "$BUILD_LOG"
 fi
+rm -f "$BUILD_LOG"
 
 echo ""
 echo "⚙️  Step 3: Checking deployment configurations..."
@@ -113,3 +115,4 @@ fi
 echo ""
 echo "=========================================="
 echo "For detailed deployment guide, see QUICK-DEPLOY.md"
+

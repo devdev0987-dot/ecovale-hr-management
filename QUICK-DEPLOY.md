@@ -83,7 +83,7 @@ If you prefer manual deployment without GitHub Actions:
 1. Go to https://app.netlify.com/
 2. Click "Add new site" → "Import an existing project"
 3. Connect to GitHub
-4. Select `devdev0987-dot/ecovale-hr-management`
+4. Select your repository (`YOUR_USERNAME/ecovale-hr-management`)
 5. Netlify will auto-detect settings from `netlify.toml`
 6. Click "Deploy site"
 
@@ -129,7 +129,6 @@ The workflow is configured in `.github/workflows/frontend-deploy.yml`
 
 **Triggers:**
 - Push to `main` branch
-- Push to feature branches (currently: `copilot/fix-blank-page-issue`)
 - Pull requests to `main`
 - Manual workflow dispatch
 
@@ -139,9 +138,7 @@ The workflow is configured in `.github/workflows/frontend-deploy.yml`
 
 ---
 
-## 🎨 Current Deployment Status
-
-### Branch: `copilot/fix-blank-page-issue`
+## 🎨 Deployment Status
 
 **Status:** ✅ Ready for Deployment
 
@@ -153,7 +150,7 @@ The workflow is configured in `.github/workflows/frontend-deploy.yml`
 
 **Next Steps:**
 1. Add Netlify secrets (one-time setup)
-2. Push this branch or merge to main
+2. Merge changes to main branch
 3. GitHub Actions will auto-deploy
 4. Get your live URL! 🎉
 
@@ -271,3 +268,4 @@ After deployment, verify:
 
 *Last Updated: January 29, 2026*
 *Ready for immediate deployment! 🚀*
+
