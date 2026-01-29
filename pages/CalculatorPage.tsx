@@ -143,7 +143,7 @@ const CalculatorPage: React.FC = () => {
         <div className="max-w-4xl mx-auto">
             <h2 className="text-2xl font-semibold text-gray-800 mb-6">ESI & PF</h2>
             
-            {/* Tab Navigation */
+            {/* Tab Navigation */}
             <div className="bg-white rounded-lg shadow-md mb-6">
                 <div className="flex border-b">
                     <button
