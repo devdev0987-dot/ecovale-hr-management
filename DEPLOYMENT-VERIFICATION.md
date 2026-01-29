@@ -208,7 +208,12 @@ https://your-app.netlify.app  # or .vercel.app
 {
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "framework": "vite"
+  "installCommand": "npm install",
+  "devCommand": "npm run dev",
+  "framework": "vite",
+  "env": {
+    "VITE_API_BASE_URL": "@vite_api_base_url"
+  }
 }
 ```
 
