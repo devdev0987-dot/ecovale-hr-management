@@ -1,0 +1,218 @@
+name: Frontend CI/CD - Deploy
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '**/*.tsx'
+      - '**/*.ts'
+      - '*.html'
+      - 'components/**'
+      - 'pages/**'
+      - 'services/**'
+      - 'contexts/**'
+      - 'utils/**'
+      - 'types/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'vite.config.ts'
+      - 'tsconfig.json'
+      - '.github/workflows/frontend-deploy.yml'
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - preview
+
+env:
+  NODE_VERSION: '18'
+
+jobs:
+  # Job 1: Build and Test Frontend
+  build:
+    name: Build Frontend
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build application
+        run: npm run build
+        env:
+          NODE_ENV: production
+      
+      - name: Check build output
+        run: |
+          echo "Build completed successfully"
+          ls -lah dist/
+          echo "Verifying index.html exists and is not empty"
+          if [ -s dist/index.html ]; then
+            echo "✅ index.html is present and contains content"
+          else
+            echo "❌ index.html is missing or empty"
+            exit 1
+          fi
+      
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: dist/
+          retention-days: 7
+      
+      - name: Upload build artifacts for deployment
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/copilot/fix-blank-page-issue')
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployment-ready
+          path: |
+            dist/
+            netlify.toml
+            vercel.json
+            package.json
+          retention-days: 1
+
+  # Job 2: Deploy to Netlify
+  deploy-netlify:
+    name: Deploy to Netlify
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      pull-requests: write
+      deployments: write
+    environment:
+      name: netlify-production
+      url: ${{ steps.deploy.outputs.url }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: deployment-ready
+          path: ./
+      
+      - name: Display structure of downloaded files
+        run: ls -R
+      
+      - name: Deploy to Netlify
+        id: deploy
+        uses: nwtgck/actions-netlify@v3.0
+        with:
+          publish-dir: './dist'
+          production-branch: main
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          deploy-message: "Deploy from GitHub Actions - ${{ github.event.head_commit.message }}"
+          enable-pull-request-comment: true
+          enable-commit-comment: true
+          overwrites-pull-request-comment: true
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        timeout-minutes: 5
+      
+      - name: Deployment Summary
+        run: |
+          echo "## Netlify Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ **Deployment Successful**" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **URL:** ${{ steps.deploy.outputs.deploy-url }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+  # Job 3: Health Check
+  health-check:
+    name: Deployment Health Check
+    runs-on: ubuntu-latest
+    needs: deploy-netlify
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+    
+    steps:
+      - name: Wait for deployment
+        run: |
+          echo "Waiting for deployment to stabilize..."
+          sleep 10
+          echo "Note: Configure DEPLOYMENT_URL for automated health checks"
+      
+      - name: Verify deployment (if URL configured)
+        if: env.DEPLOYMENT_URL != ''
+        run: |
+          echo "Checking deployment at: $DEPLOYMENT_URL"
+          for i in {1..10}; do
+            if curl -f -s -o /dev/null "$DEPLOYMENT_URL"; then
+              echo "✅ Deployment is accessible"
+              exit 0
+            fi
+            echo "Attempt $i failed, waiting 5 seconds..."
+            sleep 5
+          done
+          echo "❌ Deployment health check failed"
+          exit 1
+      
+      - name: Notify success
+        if: success()
+        run: |
+          echo "## 🎉 Deployment Successful!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "The frontend has been successfully deployed." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Next Steps:" >> $GITHUB_STEP_SUMMARY
+          echo "1. Visit the deployment URL to verify the application" >> $GITHUB_STEP_SUMMARY
+          echo "2. Test login functionality" >> $GITHUB_STEP_SUMMARY
+          echo "3. Verify all pages are accessible" >> $GITHUB_STEP_SUMMARY
+
+  # Job 4: Notify on Failure
+  notify-failure:
+    name: Notify on Failure
+    runs-on: ubuntu-latest
+    needs: [build, deploy-netlify, health-check]
+    if: failure()
+    permissions:
+      contents: read
+    
+    steps:
+      - name: Create failure summary
+        run: |
+          echo "## ❌ Deployment Failed" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "The deployment process encountered an error." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Please check the workflow logs for details." >> $GITHUB_STEP_SUMMARY
+
