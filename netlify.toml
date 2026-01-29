@@ -11,6 +11,9 @@
   # Environment variables
   [build.environment]
     NODE_VERSION = "18"
+    # Configure VITE_API_BASE_URL through Netlify dashboard environment variables
+    # Placeholder below - replace with actual backend URL in Netlify settings
+    VITE_API_BASE_URL = "https://your-backend-url.com"
 
 # SPA Redirect Rules - Fix 404 on page refresh/direct routes
 [[redirects]]
