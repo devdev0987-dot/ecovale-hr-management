@@ -7,6 +7,7 @@ import { useAppContext } from '../contexts/AppContext';
 
 type ActiveTab = 'enrollment' | 'statements';
 
+
 const CalculatorPage: React.FC = () => {
     const { showToast } = useAppContext();
     const [activeTab, setActiveTab] = useState<ActiveTab>('enrollment');
@@ -143,26 +144,18 @@ const CalculatorPage: React.FC = () => {
         <div className="max-w-4xl mx-auto">
             <h2 className="text-2xl font-semibold text-gray-800 mb-6">ESI & PF</h2>
             
-            {/* Tab Navigation */
+             /* Tab Navigation */
             <div className="bg-white rounded-lg shadow-md mb-6">
                 <div className="flex border-b">
                     <button
                         onClick={() => setActiveTab('enrollment')}
-                        className={`flex-1 py-3 px-6 text-center font-medium transition-colors ${
-                            activeTab === 'enrollment'
-                                ? 'border-b-2 border-blue-500 text-blue-600'
-                                : 'text-gray-600 hover:text-gray-800'
-                        }`}
+                        className={(activeTab === 'enrollment') ? 'flex-1 py-3 px-6 text-center font-medium transition-colors border-b-2 border-blue-500 text-blue-600' : 'flex-1 py-3 px-6 text-center font-medium transition-colors text-gray-600 hover:text-gray-800'}
                     >
                         Enrollment
                     </button>
                     <button
                         onClick={() => setActiveTab('statements')}
-                        className={`flex-1 py-3 px-6 text-center font-medium transition-colors ${
-                            activeTab === 'statements'
-                                ? 'border-b-2 border-blue-500 text-blue-600'
-                                : 'text-gray-600 hover:text-gray-800'
-                        }`}
+                        className={(activeTab === 'statements') ? 'flex-1 py-3 px-6 text-center font-medium transition-colors border-b-2 border-blue-500 text-blue-600' : 'flex-1 py-3 px-6 text-center font-medium transition-colors text-gray-600 hover:text-gray-800'}
                     >
                         Statements
                     </button>
