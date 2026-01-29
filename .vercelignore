@@ -8,7 +8,8 @@ pnpm-debug.log*
 # Testing
 coverage
 
-# Build artifacts (Vercel will build these)
+# Build artifacts
+# Note: Vercel performs its own build, so we exclude build outputs to avoid conflicts
 dist
 dist-ssr
 *.local
@@ -31,8 +32,11 @@ dist-ssr
 .gitignore
 
 # Documentation (optional - remove if you want docs deployed)
+# Note: Keep essential docs if your app links to them from within the UI
+# Currently excluding most docs as they're for development/repository reference
 *.md
 !README.md
+!DEMO-CREDENTIALS.md
 
 # Backend directory (not needed for frontend deployment)
 backend

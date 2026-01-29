@@ -8,6 +8,16 @@ Complete step-by-step guide for deploying the Ecovale HR Management System on Ve
 - Vercel account (https://vercel.com) - Free tier available
 - Git repository pushed to GitHub
 
+---
+
+**ℹ️ Note on Configuration:**  
+This project uses `vercel.json` for build configuration. Environment variables are managed through the Vercel Dashboard or CLI (not in vercel.json).
+
+**Required Environment Variable:**
+- `VITE_API_BASE_URL` - Your backend API endpoint (see [Environment Variables](#-environment-variables) section below)
+
+---
+
 ## 🔧 Quick Deploy (Recommended)
 
 ### Method 1: Deploy via Vercel Dashboard
@@ -167,8 +177,11 @@ The project includes a `vercel.json` configuration file:
 ```
 
 **What this does:**
-- `rewrites`: Routes all requests to `index.html` (SPA routing)
-- `headers`: Adds cache headers for optimal performance on static assets
+- `rewrites`: Routes all non-existent routes to `index.html` for SPA client-side routing. Static files in the `dist` directory (like `/assets/*`, `/index.html`, etc.) are served normally without rewriting. This is the standard pattern for SPAs.
+- `headers`: Adds cache headers for optimal performance on static assets (1 year cache for immutable hashed assets)
+
+**Note on Environment Variables:**  
+Environment variables are not defined in `vercel.json`. Instead, configure them via the Vercel Dashboard (Settings → Environment Variables) or using the Vercel CLI. See the [Environment Variables](#-environment-variables) section above for required configuration.
 
 ### .vercelignore
 
@@ -185,9 +198,12 @@ The `.vercelignore` file excludes unnecessary files from deployment:
 1. Go to Project Settings → Domains
 2. Click "Add Domain"
 3. Enter your domain (e.g., `hr.yourdomain.com`)
-4. Follow DNS configuration instructions:
-   - Add CNAME record: `hr` → `cname.vercel-dns.com`
-   - Or A record to Vercel's IP (76.76.21.21)
+4. Follow DNS configuration instructions from Vercel dashboard:
+   - **CNAME record (Recommended):** `hr` → `cname.vercel-dns.com`
+   - **A record:** Point to Vercel's IP (check Vercel dashboard for current IP)
+   
+   > **Note:** Always refer to the Vercel dashboard for the most up-to-date DNS configuration values, as IPs and CNAMEs may change over time.
+
 5. Wait for DNS propagation (5-60 minutes)
 
 ### SSL Certificate
