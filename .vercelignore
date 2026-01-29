@@ -1,0 +1,51 @@
+# Dependencies
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Testing
+coverage
+
+# Build artifacts
+# Note: Vercel performs its own build, so we exclude build outputs to avoid conflicts
+dist
+dist-ssr
+*.local
+
+# Environment files (use Vercel dashboard instead)
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*.swn
+.DS_Store
+
+# Git
+.git
+.gitignore
+
+# Documentation (optional - remove if you want docs deployed)
+# Note: Keep essential docs if your app links to them from within the UI
+# Currently excluding most docs as they're for development/repository reference
+*.md
+!README.md
+!DEMO-CREDENTIALS.md
+
+# Backend directory (not needed for frontend deployment)
+backend
+
+# Database design files
+db-design
+
+# Production directory
+production
+
+# Metadata
+metadata.json

@@ -55,6 +55,16 @@
 
 **📖 More test accounts available in [DEMO-CREDENTIALS.md](DEMO-CREDENTIALS.md)**
 
+### 🚀 Quick Deploy to Vercel
+
+<div align="center">
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/devdev0987-dot/ecovale-hr-management&env=VITE_API_BASE_URL&envDescription=Backend%20API%20URL%20(e.g.%20https://your-backend.railway.app/api/v1)&project-name=ecovale-hr-management&repository-name=ecovale-hr-management)
+
+**One-click deploy to Vercel** • [Detailed Guide →](VERCEL-DEPLOYMENT.md)
+
+</div>
+
 ---
 
 ## 📋 Table of Contents
@@ -433,10 +443,36 @@ CORS_ALLOWED_ORIGINS=https://your-app.netlify.app
 
 **🎉 Done! Your HR system is now publicly accessible!**
 
+### Alternative: Frontend Deployment → Vercel (Free Tier)
+
+**Why Vercel?** Optimized for React/Vite, instant deployments, automatic SSL
+
+```bash
+# 1. Install Vercel CLI
+npm install -g vercel
+
+# 2. Login to Vercel
+vercel login
+
+# 3. Deploy
+vercel
+
+# 4. Deploy to production
+vercel --prod
+
+# 5. Set environment variable in Vercel dashboard:
+VITE_API_BASE_URL=https://your-backend.railway.app/api/v1
+```
+
+**✅ Your frontend is now live on Vercel!**
+
+📖 **Detailed Vercel Guide:** [VERCEL-DEPLOYMENT.md](VERCEL-DEPLOYMENT.md) - Complete Vercel-specific deployment guide with dashboard method, troubleshooting, and best practices.
+
 ### Complete Deployment Guide
 
 For step-by-step instructions with screenshots and troubleshooting:
 - **[DEPLOYMENT-GUIDE.md](DEPLOYMENT-GUIDE.md)** - Complete deployment guide (Railway, Render, Netlify, Vercel)
+- **[VERCEL-DEPLOYMENT.md](VERCEL-DEPLOYMENT.md)** - Dedicated Vercel deployment guide (recommended for Vercel users)
 - **[DEPLOYMENT-SUMMARY.md](DEPLOYMENT-SUMMARY.md)** - Quick deployment checklist
 - **[DEMO-CREDENTIALS.md](DEMO-CREDENTIALS.md)** - Test accounts and API examples
 
@@ -450,6 +486,7 @@ For step-by-step instructions with screenshots and troubleshooting:
 |----------|-------------|----------|
 | **Architecture Guide** | System architecture, diagrams, tech stack | [ARCHITECTURE.md](ARCHITECTURE.md) |
 | **Deployment Guide** | Deploy to Railway/Render/Netlify/Vercel | [DEPLOYMENT-GUIDE.md](DEPLOYMENT-GUIDE.md) |
+| **Vercel Deployment** | Dedicated Vercel deployment guide | [VERCEL-DEPLOYMENT.md](VERCEL-DEPLOYMENT.md) |
 | **Deployment Summary** | Quick deployment checklist | [DEPLOYMENT-SUMMARY.md](DEPLOYMENT-SUMMARY.md) |
 | **Demo Credentials** | Test accounts and API examples | [DEMO-CREDENTIALS.md](DEMO-CREDENTIALS.md) |
 | **API Documentation** | Complete API reference, versioning, examples | [backend/API-DOCUMENTATION.md](backend/API-DOCUMENTATION.md) |
