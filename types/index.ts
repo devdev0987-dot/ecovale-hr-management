@@ -105,6 +105,9 @@ export interface Employee {
   documents: Document[];
   careerHistory: CareerHistoryItem[];
   status: 'active' | 'inactive';
+  onboardingStatus?: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED';
+  onboardingStartedAt?: string;
+  onboardingCompletedAt?: string;
   createdAt: string;
   updatedAt: string;
 }

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronRight, ChevronLeft, CheckCircle, User, Users, FileText } from 'lucide-react';
 import { useAppContext } from '../contexts/AppContext';
-import { getEmployees, getEmployeeById, updateEmployee } from '../services/storageService';
+import { getEmployees, getEmployeeById, updateEmployee, saveEmployee } from '../services/storageService';
 import { Employee } from '../types';
 
 const EmployeeOnboarding: React.FC = () => {
@@ -243,65 +243,177 @@ const EmployeeOnboarding: React.FC = () => {
   const nextStep = () => { if (currentStep < 3) setCurrentStep(currentStep + 1); };
   const prevStep = () => { if (currentStep > 1) setCurrentStep(currentStep - 1); };
 
+  // Validation function to check if all required fields are filled
+  const validateOnboardingData = (): { valid: boolean; errors: string[] } => {
+    const errors: string[] = [];
+
+    // Personal Details validation
+    if (!formData.fullName?.trim()) errors.push('Full Name is required');
+    if (!formData.email?.trim()) errors.push('Email is required');
+    if (!formData.phone?.trim()) errors.push('Phone Number is required');
+    if (!formData.dateOfBirth) errors.push('Date of Birth is required');
+    if (!formData.bloodGroup) errors.push('Blood Group is required');
+    if (!formData.currentAddress?.trim()) errors.push('Current Address is required');
+
+    // Family Information validation
+    if (!formData.fatherName?.trim()) errors.push('Father Name is required');
+    if (!formData.motherName?.trim()) errors.push('Mother Name is required');
+
+    // Statutory Information validation
+    if (!formData.pfNumber?.trim()) errors.push('PF Number is required');
+    if (!formData.bankName?.trim()) errors.push('Bank Name is required');
+    if (!formData.accountHolderName?.trim()) errors.push('Account Holder Name is required');
+    if (!formData.accountNumber?.trim()) errors.push('Account Number is required');
+    if (!formData.ifscCode?.trim()) errors.push('IFSC Code is required');
+
+    return { valid: errors.length === 0, errors };
+  };
+
   const handleSubmit = async () => {
     try {
-      if (!formData.employeeId) {
-        showToast('Employee ID is required', 'error');
+      // Validate all required fields before completion
+      const validation = validateOnboardingData();
+      if (!validation.valid) {
+        showToast(`Please complete all required fields: ${validation.errors.join(', ')}`, 'error');
         return;
       }
 
-      if (!formData.fullName || !formData.email || !formData.phone) {
-        showToast('Please fill in all required fields', 'error');
-        return;
-      }
+      // Extract name parts
+      const names = formData.fullName.split(' ');
+      const firstName = names[0] || '';
+      const lastName = names.slice(1).join(' ') || '';
 
-      // Check if employee with this ID already exists
+      // Check if employee already exists
       const existingEmployee = await getEmployeeById(formData.employeeId);
       
       if (existingEmployee) {
-        // Update existing employee
-        const names = formData.fullName.split(' ');
+        // CASE 1: Update existing employee and complete onboarding
+        // This maintains the SAME Employee ID - never creates a new one
+        
         const updatedEmployee: Employee = {
           ...existingEmployee,
           personalInfo: {
             ...existingEmployee.personalInfo,
-            firstName: names[0] || existingEmployee.personalInfo.firstName,
-            lastName: names.slice(1).join(' ') || existingEmployee.personalInfo.lastName,
-            dob: formData.dateOfBirth || existingEmployee.personalInfo.dob,
-            contactNumber: formData.phone || existingEmployee.personalInfo.contactNumber,
+            firstName: firstName,
+            lastName: lastName,
+            dob: formData.dateOfBirth,
+            contactNumber: formData.phone,
             emergencyContact: formData.emergencyContact || existingEmployee.personalInfo.emergencyContact,
-            personalEmail: formData.email || existingEmployee.personalInfo.personalEmail,
+            personalEmail: formData.email,
             permanentAddress: formData.permanentAddress || existingEmployee.personalInfo.permanentAddress,
-            currentAddress: formData.currentAddress || existingEmployee.personalInfo.currentAddress,
-            bloodGroup: formData.bloodGroup || existingEmployee.personalInfo.bloodGroup,
-            fatherName: formData.fatherName || existingEmployee.personalInfo.fatherName,
-            motherName: formData.motherName || existingEmployee.personalInfo.motherName,
-            pfNumber: formData.pfNumber || existingEmployee.personalInfo.pfNumber,
+            currentAddress: formData.currentAddress,
+            bloodGroup: formData.bloodGroup,
+            fatherName: formData.fatherName,
+            motherName: formData.motherName,
+            pfNumber: formData.pfNumber,
             esiNumber: formData.esiNumber || existingEmployee.personalInfo.esiNumber,
           },
           salaryInfo: {
             ...existingEmployee.salaryInfo,
             bankDetails: {
-              bankName: formData.bankName || existingEmployee.salaryInfo?.bankDetails?.bankName || '',
-              accountHolder: formData.accountHolderName || existingEmployee.salaryInfo?.bankDetails?.accountHolder || '',
-              accountNumber: formData.accountNumber || existingEmployee.salaryInfo?.bankDetails?.accountNumber || '',
-              ifscCode: formData.ifscCode || existingEmployee.salaryInfo?.bankDetails?.ifscCode || '',
+              bankName: formData.bankName,
+              accountHolder: formData.accountHolderName,
+              accountNumber: formData.accountNumber,
+              ifscCode: formData.ifscCode,
               branch: formData.branchName || existingEmployee.salaryInfo?.bankDetails?.branch || '',
             }
-          }
+          },
+          // Mark onboarding as COMPLETED
+          onboardingStatus: 'COMPLETED',
+          onboardingCompletedAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
         };
 
         await updateEmployee(updatedEmployee);
-        showToast(`Employee ${formData.employeeId} updated successfully!`, 'success');
+        showToast(`✓ Onboarding completed for Employee ${existingEmployee.id}`, 'success');
+        
       } else {
-        showToast(`Employee ${formData.employeeId} does not exist. Please add them in Employee Management first.`, 'error');
-        return;
+        // CASE 2: Create new employee with onboarding data
+        // This creates the FIRST and ONLY record for this employee
+        
+        const newEmployeeData: Omit<Employee, 'id' | 'createdAt' | 'updatedAt'> = {
+          personalInfo: {
+            firstName: firstName,
+            lastName: lastName,
+            dob: formData.dateOfBirth,
+            gender: 'Other', // Can be updated later in Employee Management
+            contactNumber: formData.phone,
+            emergencyContact: formData.emergencyContact || '',
+            personalEmail: formData.email,
+            permanentAddress: formData.permanentAddress || '',
+            currentAddress: formData.currentAddress,
+            bloodGroup: formData.bloodGroup,
+            fatherName: formData.fatherName,
+            motherName: formData.motherName,
+            pfNumber: formData.pfNumber,
+            esiNumber: formData.esiNumber || '',
+          },
+          employmentDetails: {
+            type: 'full-time',
+            department: 'IT', // Default - update in Employee Management
+            designation: '', // Will be set in Employee Management
+            joinDate: new Date().toISOString().split('T')[0],
+            officialEmail: '', // Will be set in Employee Management
+            workLocation: 'Bangalore', // Default
+            probationPeriod: 3,
+          },
+          salaryInfo: {
+            ctc: 0,
+            basic: 0,
+            hraPercentage: 40,
+            hra: 0,
+            conveyance: 0,
+            telephone: 0,
+            medicalAllowance: 0,
+            specialAllowance: 0,
+            employeeHealthInsuranceAnnual: 0,
+            gross: 0,
+            includePF: true,
+            includeESI: false,
+            pfDeduction: 0,
+            employerPF: 0,
+            esiDeduction: 0,
+            employerESI: 0,
+            professionalTax: 0,
+            tds: 0,
+            tdsMonthly: 0,
+            professionalFeesMonthly: 0,
+            professionalFeesInclusive: false,
+            professionalFeesBaseMonthly: 0,
+            professionalFeesTotalMonthly: 0,
+            professionalFeesBaseAnnual: 0,
+            professionalFeesTotalAnnual: 0,
+            net: 0,
+            paymentMode: 'Bank',
+            bankDetails: {
+              bankName: formData.bankName,
+              accountHolder: formData.accountHolderName,
+              accountNumber: formData.accountNumber,
+              ifscCode: formData.ifscCode,
+              branch: formData.branchName || '',
+            }
+          },
+          documents: [],
+          careerHistory: [],
+          status: 'active',
+          // Set onboarding tracking fields
+          onboardingStatus: 'COMPLETED',
+          onboardingStartedAt: new Date().toISOString(),
+          onboardingCompletedAt: new Date().toISOString(),
+        };
+
+        const savedEmployee = await saveEmployee(newEmployeeData);
+        showToast(`✓ Employee ${savedEmployee.id} onboarded successfully!`, 'success');
       }
       
       bumpEmployeesVersion();
       
-      // Reset form and generate new ID
-      const newId = generateEmployeeId(employees);
+      // Reload employees list to get updated data
+      const updatedEmployees = await getEmployees();
+      setEmployees(updatedEmployees);
+      
+      // Reset form for next employee
+      const newId = generateEmployeeId(updatedEmployees);
       setFormData({
         employeeId: newId,
         fullName: '',
@@ -341,8 +453,8 @@ const EmployeeOnboarding: React.FC = () => {
       setSelectedEmployeeId('');
       setCurrentStep(1);
     } catch (error) {
-      console.error('Failed to save onboarding data:', error);
-      showToast('Failed to save onboarding data', 'error');
+      console.error('Failed to complete onboarding:', error);
+      showToast('Failed to complete onboarding. Please try again.', 'error');
     }
   };
 
@@ -358,6 +470,28 @@ const EmployeeOnboarding: React.FC = () => {
         <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
           <h1 className="text-3xl font-bold text-gray-800 mb-2">Employee Onboarding</h1>
           <p className="text-gray-600">Complete employee profile to finish the onboarding process</p>
+        </div>
+
+        {/* Information Banner */}
+        <div className="bg-blue-50 border-l-4 border-blue-500 rounded-lg p-4 mb-6">
+          <div className="flex items-start">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-blue-800">Employee ID Information</h3>
+              <div className="mt-2 text-sm text-blue-700">
+                <ul className="list-disc list-inside space-y-1">
+                  <li>A unique Employee ID (e.g., {formData.employeeId}) is assigned at the start of onboarding</li>
+                  <li>All onboarding data will be saved under this Employee ID</li>
+                  <li>Click "Complete Onboarding" to finalize and mark the employee as active</li>
+                  <li>You can edit employee details later in Employee Management without changing the ID</li>
+                </ul>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Progress Steps */}
