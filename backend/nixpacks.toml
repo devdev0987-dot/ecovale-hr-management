@@ -1,15 +1,18 @@
 # Nixpacks configuration for Railway deployment
+[providers]
+java = "17"
+
 [phases.setup]
 nixPkgs = ["maven", "jdk17"]
 
 [phases.build]
 cmds = [
-  "mvn clean package -DskipTests -U"
+  "mvn clean package -DskipTests -U -B -e"
 ]
 
 [phases.start]
-cmd = "java -Xmx512m -Dserver.port=$PORT -Dspring.profiles.active=railway -jar target/hr-backend-1.0.0.jar"
+cmd = "java -XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -Djava.security.egd=file:/dev/./urandom -Dserver.port=$PORT -Dspring.profiles.active=railway -jar target/hr-backend-1.0.0.jar"
 
 [variables]
-MAVEN_OPTS = "-Xmx512m"
-JAVA_TOOL_OPTIONS = "-Xmx512m"
+MAVEN_OPTS = "-Xmx1024m"
+JAVA_TOOL_OPTIONS = "-Xmx1024m"
