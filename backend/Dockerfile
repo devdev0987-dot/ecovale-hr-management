@@ -1,8 +1,9 @@
 # =================================================================
-# Multi-Stage Dockerfile for Ecovale HR Backend
+# Multi-Stage Dockerfile for Spring Boot Backend - Production Ready
 # =================================================================
-# Stage 1: Build the application using Maven
-# Stage 2: Run the application using OpenJDK 17 slim
+# Optimized for: Railway, Render, Fly.io, or any cloud provider
+# Features: Multi-stage build, non-root user, minimal image size
+# =================================================================
 
 # =================================================================
 # Stage 1: BUILD
@@ -22,18 +23,20 @@ RUN mvn dependency:go-offline -B
 COPY src ./src
 
 # Build the application (skip tests for faster builds)
-# Use -DskipTests to skip running tests during build
 RUN mvn clean package -DskipTests -B
 
 # =================================================================
-# Stage 2: RUNTIME
+# Stage 2: RUNTIME - Production
 # =================================================================
 FROM eclipse-temurin:17-jre-alpine
 
 # Metadata
 LABEL maintainer="Ecovale HR Team"
 LABEL description="Ecovale HR Management Backend API"
-LABEL version="1.0"
+LABEL version="1.0.0"
+
+# Install dumb-init for proper signal handling
+RUN apk add --no-cache dumb-init
 
 # Create non-root user for security
 RUN addgroup -S spring && adduser -S spring -G spring
@@ -42,12 +45,36 @@ RUN addgroup -S spring && adduser -S spring -G spring
 WORKDIR /app
 
 # Copy the JAR from builder stage
-COPY --from=builder /build/target/*.jar app.jar
+COPY --from=builder /build/target/hr-backend-*.jar app.jar
 
 # Change ownership to spring user
 RUN chown -R spring:spring /app
 
 # Switch to non-root user
+USER spring:spring
+
+# Expose port (will be overridden by $PORT on Railway/Render)
+EXPOSE 8080
+
+# Health check (optional - some platforms handle this automatically)
+HEALTHCHECK --interval=30s --timeout=3s --start-period=60s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost:${PORT:-8080}/actuator/health || exit 1
+
+# Use dumb-init to handle signals properly
+# This ensures graceful shutdown when container stops
+ENTRYPOINT ["dumb-init", "--"]
+
+# Start the application with optimized JVM settings
+# -XX:+UseContainerSupport: Auto-detect container memory limits
+# -XX:MaxRAMPercentage=75.0: Use 75% of available memory
+# -Djava.security.egd=file:/dev/./urandom: Faster startup
+CMD ["java", \
+     "-XX:+UseContainerSupport", \
+     "-XX:MaxRAMPercentage=75.0", \
+     "-Djava.security.egd=file:/dev/./urandom", \
+     "-Dserver.port=${PORT:-8080}", \
+     "-jar", \
+     "app.jar"]
 USER spring
 
 # Expose application port

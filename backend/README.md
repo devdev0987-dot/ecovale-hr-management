@@ -1,7 +1,27 @@
 # Ecovale HR Backend - Spring Boot REST API
 
+## 🚀 Quick Deploy (You're in the backend directory!)
+
+### Deploy to Railway:
+```bash
+# Option 1: Automated script
+./deploy.sh
+
+# Option 2: Railway CLI
+railway login
+railway link
+railway variables set SPRING_PROFILES_ACTIVE=railway
+railway variables set JWT_SECRET=$(openssl rand -base64 64)
+railway variables set CORS_ALLOWED_ORIGINS=https://yourdomain.github.io
+railway up
+```
+
+**📚 Full Deployment Guide**: See [PRODUCTION-DEPLOYMENT-GUIDE.md](PRODUCTION-DEPLOYMENT-GUIDE.md)
+
+---
+
 ## Overview
-Complete production-ready backend REST API for the Ecovale HR Management System built with **Java Spring Boot**, **Spring Data JPA**, **MySQL**, and **Spring Security with JWT Authentication**.
+Complete production-ready backend REST API for the Ecovale HR Management System built with **Java Spring Boot**, **Spring Data JPA**, **PostgreSQL/MySQL**, and **Spring Security with JWT Authentication**.
 
 ## 🔒 Security
 This backend uses **JWT (JSON Web Token)** authentication to secure all API endpoints.
