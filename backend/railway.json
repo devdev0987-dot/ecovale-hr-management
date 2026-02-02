@@ -1,23 +1,9 @@
 {
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
-    "builder": "NIXPACKS",
-    "nixpacksPlan": {
-      "phases": {
-        "setup": {
-          "nixPkgs": ["maven", "jdk17"]
-        },
-        "build": {
-          "cmds": ["mvn clean package -DskipTests -U -B"]
-        }
-      },
-      "start": {
-        "cmd": "java -XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -Djava.security.egd=file:/dev/./urandom -Dserver.port=$PORT -Dspring.profiles.active=railway -jar target/hr-backend-1.0.0.jar"
-      }
-    }
+    "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "java -XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -Djava.security.egd=file:/dev/./urandom -Dserver.port=$PORT -Dspring.profiles.active=railway -jar target/hr-backend-1.0.0.jar",
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10,
     "healthcheckPath": "/actuator/health",

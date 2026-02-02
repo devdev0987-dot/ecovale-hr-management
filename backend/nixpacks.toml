@@ -1,6 +1,5 @@
 # Nixpacks configuration for Railway deployment
-[providers]
-java = "17"
+providers = ["java"]
 
 [phases.setup]
 nixPkgs = ["maven", "jdk17"]
