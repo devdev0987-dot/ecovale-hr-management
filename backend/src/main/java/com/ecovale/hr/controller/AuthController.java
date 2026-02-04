@@ -94,7 +94,7 @@ public class AuthController {
             
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ApiResponse(false, "Invalid username or password"));
+                    .body(new ApiResponse<>(false, "Invalid username or password", null));
         }
     }
     
