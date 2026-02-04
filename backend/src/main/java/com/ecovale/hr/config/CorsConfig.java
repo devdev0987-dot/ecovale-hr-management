@@ -38,7 +38,12 @@ public class CorsConfig {
                         .allowedMethods("GET")
                         .allowCredentials(false);
                         
-                registry.addMapping("/swagger-ui/**", "/v3/api-docs/**")
+                registry.addMapping("/swagger-ui/**")
+                        .allowedOrigins("*")
+                        .allowedMethods("GET")
+                        .allowCredentials(false);
+                        
+                registry.addMapping("/v3/api-docs/**")
                         .allowedOrigins("*")
                         .allowedMethods("GET")
                         .allowCredentials(false);

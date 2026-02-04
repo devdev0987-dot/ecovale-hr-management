@@ -107,13 +107,13 @@ public class AuthController {
         // Check if username exists
         if (userRepository.existsByUsername(registerRequest.getUsername())) {
             return ResponseEntity.badRequest()
-                    .body(new ApiResponse(false, "Username is already taken"));
+                    .body(new ApiResponse<>(false, "Username is already taken", null));
         }
         
         // Check if email exists
         if (userRepository.existsByEmail(registerRequest.getEmail())) {
             return ResponseEntity.badRequest()
-                    .body(new ApiResponse(false, "Email is already in use"));
+                    .body(new ApiResponse<>(false, "Email is already in use", null));
         }
         
         // Create new user
@@ -160,7 +160,7 @@ public class AuthController {
         userRepository.save(user);
         
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new ApiResponse(true, "User registered successfully"));
+                .body(new ApiResponse<>(true, "User registered successfully", null));
     }
     
     /**
@@ -193,7 +193,7 @@ public class AuthController {
             
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ApiResponse(false, "User not authenticated"));
+                    .body(new ApiResponse<>(false, "User not authenticated", null));
         }
     }
 }

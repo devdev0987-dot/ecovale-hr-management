@@ -70,13 +70,10 @@ public class LeaveService {
         LeaveRequest savedLeave = leaveRequestRepository.save(leaveRequest);
         
         // Audit log
-        auditLogService.logAsync(
-            getCurrentUsername(),
-            "CREATE",
+        auditLogService.logCreate(
             "LeaveRequest",
             savedLeave.getId(),
-            String.format("Leave request created for %s (%d days)",
-                dto.getEmployeeName(), savedLeave.getNumberOfDays())
+            savedLeave
         );
         
         log.info("Leave request created with ID: {}", savedLeave.getId());
@@ -161,13 +158,11 @@ public class LeaveService {
         LeaveRequest updated = leaveRequestRepository.save(leaveRequest);
         
         // Audit log
-        auditLogService.logAsync(
-            managerUsername,
-            "UPDATE",
+        auditLogService.logUpdate(
             "LeaveRequest",
             id,
-            String.format("Manager approved leave request for %s (%d days). Comments: %s",
-                updated.getEmployeeName(), updated.getNumberOfDays(), approvalDTO.getComments())
+            leaveRequest,
+            updated
         );
         
         log.info("Leave request {} approved by manager {}", id, managerUsername);
@@ -197,13 +192,11 @@ public class LeaveService {
         LeaveRequest updated = leaveRequestRepository.save(leaveRequest);
         
         // Audit log
-        auditLogService.logAsync(
-            adminUsername,
-            "UPDATE",
+        auditLogService.logUpdate(
             "LeaveRequest",
             id,
-            String.format("Admin approved leave request for %s (%d days). Comments: %s",
-                updated.getEmployeeName(), updated.getNumberOfDays(), approvalDTO.getComments())
+            leaveRequest,
+            updated
         );
         
         log.info("Leave request {} finally approved by admin {}", id, adminUsername);
@@ -233,13 +226,11 @@ public class LeaveService {
         LeaveRequest updated = leaveRequestRepository.save(leaveRequest);
         
         // Audit log
-        auditLogService.logAsync(
-            username,
-            "UPDATE",
+        auditLogService.logUpdate(
             "LeaveRequest",
             id,
-            String.format("Rejected leave request for %s. Reason: %s",
-                updated.getEmployeeName(), rejectionDTO.getComments())
+            leaveRequest,
+            updated
         );
         
         log.info("Leave request {} rejected by {}", id, username);
@@ -265,12 +256,11 @@ public class LeaveService {
         LeaveRequest updated = leaveRequestRepository.save(leaveRequest);
         
         // Audit log
-        auditLogService.logAsync(
-            username,
-            "UPDATE",
+        auditLogService.logUpdate(
             "LeaveRequest",
             id,
-            String.format("Cancelled leave request for %s", updated.getEmployeeName())
+            leaveRequest,
+            updated
         );
         
         log.info("Leave request {} cancelled by employee", id);
@@ -290,12 +280,10 @@ public class LeaveService {
         leaveRequestRepository.delete(leaveRequest);
         
         // Audit log
-        auditLogService.logAsync(
-            username,
-            "DELETE",
+        auditLogService.logDelete(
             "LeaveRequest",
             id,
-            String.format("Deleted leave request for %s", leaveRequest.getEmployeeName())
+            leaveRequest
         );
         
         log.info("Leave request {} deleted by {}", id, username);
