@@ -168,27 +168,6 @@
         <finalName>${project.artifactId}-${project.version}</finalName>
         <plugins>
             <!-- Maven Compiler Plugin with Lombok Annotation Processing -->
-            <!-- Lombok Maven Plugin: Delombok before compilation -->
-            <plugin>
-                <groupId>org.projectlombok</groupId>
-                <artifactId>lombok-maven-plugin</artifactId>
-                <version>1.18.20.0</version>
-                <executions>
-                    <execution>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>delombok</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <sourceDirectory>src/main/java</sourceDirectory>
-                    <outputDirectory>${project.build.directory}/generated-sources/delombok</outputDirectory>
-                    <addOutputDirectory>true</addOutputDirectory>
-                    <encoding>UTF-8</encoding>
-                </configuration>
-            </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>

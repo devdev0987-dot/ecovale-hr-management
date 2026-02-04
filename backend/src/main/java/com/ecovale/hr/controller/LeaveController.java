@@ -1,12 +1,14 @@
 package com.ecovale.hr.controller;
 
-import com.ecovale.hr.dto.*;
+import com.ecovale.hr.dto.LeaveRequestDTO;
+import com.ecovale.hr.dto.LeaveResponseDTO;
+import com.ecovale.hr.dto.LeaveApprovalDTO;
+import com.ecovale.hr.dto.ApiResponse;
 import com.ecovale.hr.service.LeaveService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -45,13 +47,13 @@ public class LeaveController {
                      "Requires future dates and non-overlapping with approved leaves."
     )
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "201", description = "Leave request created successfully",
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "Leave request created successfully",
             content = @Content(schema = @Schema(implementation = LeaveResponseDTO.class))),
-        @ApiResponse(responseCode = "400", description = "Invalid request data or overlapping leave",
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Invalid request data or overlapping leave",
             content = @Content),
-        @ApiResponse(responseCode = "401", description = "Unauthorized - JWT token missing or invalid",
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "Unauthorized - JWT token missing or invalid",
             content = @Content),
-        @ApiResponse(responseCode = "403", description = "Forbidden - Insufficient permissions",
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "Forbidden - Insufficient permissions",
             content = @Content)
     })
     @PostMapping
@@ -72,9 +74,9 @@ public class LeaveController {
         description = "Retrieve all leave requests across the organization. Admin only."
     )
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Leave requests retrieved successfully"),
-        @ApiResponse(responseCode = "401", description = "Unauthorized"),
-        @ApiResponse(responseCode = "403", description = "Forbidden - Admin role required")
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Leave requests retrieved successfully"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "Unauthorized"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "Forbidden - Admin role required")
     })
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
@@ -92,9 +94,9 @@ public class LeaveController {
         description = "Retrieve a specific leave request by its ID"
     )
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Leave request found"),
-        @ApiResponse(responseCode = "404", description = "Leave request not found"),
-        @ApiResponse(responseCode = "401", description = "Unauthorized")
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Leave request found"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Leave request not found"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "Unauthorized")
     })
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('EMPLOYEE', 'MANAGER', 'ADMIN', 'HR')")
