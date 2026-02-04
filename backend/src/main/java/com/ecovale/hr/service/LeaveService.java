@@ -6,6 +6,8 @@ import com.ecovale.hr.dto.LeaveResponseDTO;
 import com.ecovale.hr.dto.LeaveApprovalDTO;
 import com.ecovale.hr.repository.LeaveRequestRepository;
 import com.ecovale.hr.exception.ResourceNotFoundException;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
