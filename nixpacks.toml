@@ -6,7 +6,7 @@ nixPkgs = ["maven", "jdk17"]
 
 [phases.build]
 cmds = [
-  "cd backend && mvn clean package -DskipTests -U -B -e"
+  "cd backend && mvn clean package -DskipTests -Dmaven.test.skip=true -U -B -e"
 ]
 
 [phases.start]
