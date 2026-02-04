@@ -80,13 +80,22 @@ public class RateLimitingFilter extends OncePerRequestFilter {
         
         if (path.contains("/login")) {
             // Stricter limit for login endpoint
-            limit = Bandwidth.classic(LOGIN_CAPACITY, Refill.intervally(LOGIN_CAPACITY, LOGIN_REFILL_DURATION));
+            limit = Bandwidth.builder()
+                    .capacity(LOGIN_CAPACITY)
+                    .refillIntervally(LOGIN_CAPACITY, LOGIN_REFILL_DURATION)
+                    .build();
         } else if (path.contains("/register")) {
             // Moderate limit for registration
-            limit = Bandwidth.classic(REGISTER_CAPACITY, Refill.intervally(REGISTER_CAPACITY, REGISTER_REFILL_DURATION));
+            limit = Bandwidth.builder()
+                    .capacity(REGISTER_CAPACITY)
+                    .refillIntervally(REGISTER_CAPACITY, REGISTER_REFILL_DURATION)
+                    .build();
         } else {
             // General limit for other auth endpoints
-            limit = Bandwidth.classic(GENERAL_CAPACITY, Refill.intervally(GENERAL_CAPACITY, GENERAL_REFILL_DURATION));
+            limit = Bandwidth.builder()
+                    .capacity(GENERAL_CAPACITY)
+                    .refillIntervally(GENERAL_CAPACITY, GENERAL_REFILL_DURATION)
+                    .build();
         }
         
         return Bucket.builder()

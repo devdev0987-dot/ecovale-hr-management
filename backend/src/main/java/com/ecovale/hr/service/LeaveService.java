@@ -14,7 +14,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -249,8 +248,6 @@ public class LeaveService {
             throw new IllegalStateException("Leave request cannot be cancelled in current status: " 
                 + leaveRequest.getStatus());
         }
-        
-        String username = getCurrentUsername();
         
         leaveRequest.setStatus(LeaveRequest.LeaveStatus.CANCELLED);
         LeaveRequest updated = leaveRequestRepository.save(leaveRequest);

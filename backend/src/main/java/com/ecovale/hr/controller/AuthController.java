@@ -43,7 +43,6 @@ public class AuthController {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
-    private final CustomUserDetailsService userDetailsService;
     
     /**
      * Login endpoint

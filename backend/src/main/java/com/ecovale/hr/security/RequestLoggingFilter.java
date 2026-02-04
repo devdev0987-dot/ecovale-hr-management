@@ -13,7 +13,6 @@ import org.springframework.web.util.ContentCachingResponseWrapper;
 
 import java.io.IOException;
 import java.util.Enumeration;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -151,7 +150,6 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
             String[] keyValue = param.split("=");
             if (keyValue.length == 2) {
                 String key = keyValue[0].toLowerCase();
-                String value = keyValue[1];
                 
                 if (SENSITIVE_PARAMS.contains(key)) {
                     sanitized.append(keyValue[0]).append("=[REDACTED]&");

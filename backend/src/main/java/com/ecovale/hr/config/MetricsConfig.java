@@ -1,14 +1,10 @@
 package com.ecovale.hr.config;
 
 import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Timer;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import io.micrometer.core.aop.TimedAspect;
 import io.micrometer.core.instrument.Metrics;
-import io.micrometer.core.instrument.Tag;
-import io.micrometer.core.instrument.Tags;
 import org.springframework.boot.actuate.autoconfigure.metrics.MeterRegistryCustomizer;
 
 import java.util.concurrent.atomic.AtomicLong;
@@ -53,13 +49,10 @@ public class MetricsConfig {
      */
     public static class CustomMetrics {
         
-        private final MeterRegistry registry;
         private final AtomicLong activeUsers;
         private final AtomicLong activeEmployees;
         
         public CustomMetrics(MeterRegistry registry) {
-            this.registry = registry;
-            
             // Register gauges
             this.activeUsers = registry.gauge("ecovale.users.active", new AtomicLong(0));
             this.activeEmployees = registry.gauge("ecovale.employees.active", new AtomicLong(0));
