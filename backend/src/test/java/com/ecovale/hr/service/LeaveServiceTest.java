@@ -101,7 +101,7 @@ class LeaveServiceTest {
         assertThat(result.getNumberOfDays()).isEqualTo(3);
         
         verify(leaveRequestRepository).save(any(LeaveRequest.class));
-        verify(auditLogService).logAsync(anyString(), anyString(), anyString(), anyLong(), anyString());
+        verify(auditLogService).logCreate(anyString(), anyString(), anyLong(), anyString());
     }
     
     @Test
@@ -155,7 +155,7 @@ class LeaveServiceTest {
         // Assert
         assertThat(result).isNotNull();
         verify(leaveRequestRepository).save(any(LeaveRequest.class));
-        verify(auditLogService).logAsync(anyString(), eq("UPDATE"), eq("LeaveRequest"), eq(1L), anyString());
+        verify(auditLogService).logUpdate(anyString(), eq("LeaveRequest"), eq(1L), anyString());
     }
     
     @Test
@@ -187,7 +187,7 @@ class LeaveServiceTest {
         // Assert
         assertThat(result).isNotNull();
         verify(leaveRequestRepository).save(any(LeaveRequest.class));
-        verify(auditLogService).logAsync(anyString(), eq("UPDATE"), eq("LeaveRequest"), eq(1L), anyString());
+        verify(auditLogService).logUpdate(anyString(), eq("LeaveRequest"), eq(1L), anyString());
     }
     
     @Test
@@ -204,7 +204,7 @@ class LeaveServiceTest {
         // Assert
         assertThat(result).isNotNull();
         verify(leaveRequestRepository).save(any(LeaveRequest.class));
-        verify(auditLogService).logAsync(anyString(), eq("UPDATE"), eq("LeaveRequest"), eq(1L), anyString());
+        verify(auditLogService).logUpdate(anyString(), eq("LeaveRequest"), eq(1L), anyString());
     }
     
     @Test
@@ -219,7 +219,7 @@ class LeaveServiceTest {
         // Assert
         assertThat(result).isNotNull();
         verify(leaveRequestRepository).save(any(LeaveRequest.class));
-        verify(auditLogService).logAsync(anyString(), eq("UPDATE"), eq("LeaveRequest"), eq(1L), anyString());
+        verify(auditLogService).logUpdate(anyString(), eq("LeaveRequest"), eq(1L), anyString());
     }
     
     @Test
@@ -277,6 +277,6 @@ class LeaveServiceTest {
         
         // Assert
         verify(leaveRequestRepository).delete(testLeaveRequest);
-        verify(auditLogService).logAsync(anyString(), eq("DELETE"), eq("LeaveRequest"), eq(1L), anyString());
+        verify(auditLogService).logDelete(anyString(), eq("LeaveRequest"), eq(1L), anyString());
     }
 }
