@@ -23,6 +23,15 @@ public class HealthCheckController {
     private final LocalDateTime startupTime = LocalDateTime.now();
     
     /**
+     * Root health check endpoint for Railway
+     * Returns 200 OK with simple "OK" response
+     */
+    @GetMapping("/")
+    public ResponseEntity<String> rootHealthCheck() {
+        return ResponseEntity.ok("OK");
+    }
+    
+    /**
      * Basic health check endpoint
      * Returns 200 OK if the application is running
      */
