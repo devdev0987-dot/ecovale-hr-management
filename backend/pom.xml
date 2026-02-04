@@ -184,7 +184,7 @@
                 <configuration>
                     <sourceDirectory>src/main/java</sourceDirectory>
                     <outputDirectory>${project.build.directory}/generated-sources/delombok</outputDirectory>
-                    <addOutputDirectory>false</addOutputDirectory>
+                    <addOutputDirectory>true</addOutputDirectory>
                     <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
