@@ -2,6 +2,12 @@ package com.ecovale.hr;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
+import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.ResponseEntity;
@@ -12,11 +18,24 @@ import java.util.Map;
  * Main Application class for Ecovale HR Backend
  * 
  * Spring Boot application entry point with basic health endpoints for Railway
+ * CRITICAL: Excludes DataSource/JPA/Security auto-configuration and excludes packages requiring DB
  * 
  * @author Ecovale Development Team
  * @version 1.0.0
  */
-@SpringBootApplication
+@SpringBootApplication(exclude = {
+    DataSourceAutoConfiguration.class,
+    HibernateJpaAutoConfiguration.class,
+    DataSourceTransactionManagerAutoConfiguration.class,
+    SecurityAutoConfiguration.class
+})
+@ComponentScan(
+    basePackages = "com.ecovale.hr",
+    excludeFilters = @ComponentScan.Filter(
+        type = FilterType.REGEX,
+        pattern = "com\\.ecovale\\.hr\\.(security|config|repository|service|controller|aspect).*"
+    )
+)
 @RestController
 public class EcovaleHrBackendApplication {
 
