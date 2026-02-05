@@ -31,10 +31,16 @@ import java.util.Map;
 })
 @ComponentScan(
     basePackages = "com.ecovale.hr",
-    excludeFilters = @ComponentScan.Filter(
-        type = FilterType.REGEX,
-        pattern = "com\\.ecovale\\.hr\\.(security|config|repository|service|controller|aspect).*"
-    )
+    excludeFilters = {
+        @ComponentScan.Filter(
+            type = FilterType.REGEX,
+            pattern = "com\\.ecovale\\.hr\\.(security|repository|service|controller|aspect).*"
+        ),
+        @ComponentScan.Filter(
+            type = FilterType.REGEX,
+            pattern = "com\\.ecovale\\.hr\\.config\\.(?!MinimalSecurityConfig).*"
+        )
+    }
 )
 @RestController
 public class EcovaleHrBackendApplication {
