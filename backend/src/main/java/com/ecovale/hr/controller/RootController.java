@@ -17,10 +17,18 @@ public class RootController {
     
     /**
      * Root health check endpoint for Railway
-     * Returns 200 OK with simple response
+     * Returns 200 OK immediately - no dependencies
      */
     @GetMapping("/")
-    public ResponseEntity<Map<String, String>> rootHealthCheck() {
+    public String rootHealthCheck() {
+        return "OK";
+    }
+    
+    /**
+     * Status endpoint with more details
+     */
+    @GetMapping("/status")
+    public ResponseEntity<Map<String, String>> status() {
         Map<String, String> response = new HashMap<>();
         response.put("status", "OK");
         response.put("service", "Ecovale HR Backend");

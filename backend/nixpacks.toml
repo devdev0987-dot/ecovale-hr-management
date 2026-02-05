@@ -6,11 +6,11 @@ nixPkgs = ["maven", "jdk17"]
 
 [phases.build]
 cmds = [
-  "mvn clean package -DskipTests -U -B -e"
+  "mvn clean package -DskipTests -Dmaven.test.skip=true -U -B -e -q"
 ]
 
 [phases.start]
-cmd = "java -Xms256m -Xmx512m -XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -XX:+UseG1GC -XX:+UseStringDeduplication -Djava.security.egd=file:/dev/./urandom -Dserver.port=$PORT -Dspring.profiles.active=railway -jar target/hr-backend-1.0.0.jar"
+cmd = "java -Xms128m -Xmx512m -XX:+UseSerialGC -Djava.security.egd=file:/dev/./urandom -Dserver.port=$PORT -Dspring.profiles.active=railway -jar target/hr-backend-1.0.0.jar"
 
 [variables]
 MAVEN_OPTS = "-Xmx1024m"
