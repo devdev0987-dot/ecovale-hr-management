@@ -30,9 +30,6 @@ public class OpenApiConfig {
     @Value("${app.version:1.0.0}")
     private String appVersion;
     
-    @Value("${server.port:8080}")
-    private String serverPort;
-    
     private static final String SECURITY_SCHEME_NAME = "Bearer Authentication";
     
     @Bean
@@ -113,8 +110,8 @@ public class OpenApiConfig {
     private List<Server> apiServers() {
         return List.of(
             new Server()
-                .url("http://localhost:" + serverPort)
-                .description("Local Development Server"),
+                .url("/")
+                .description("Current Server"),
             new Server()
                 .url("https://api-dev.ecovale.com")
                 .description("Development Environment"),
