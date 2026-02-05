@@ -8,7 +8,6 @@ import com.ecovale.hr.entity.Role;
 import com.ecovale.hr.entity.User;
 import com.ecovale.hr.repository.RoleRepository;
 import com.ecovale.hr.repository.UserRepository;
-import com.ecovale.hr.security.CustomUserDetailsService;
 import com.ecovale.hr.security.JwtUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
